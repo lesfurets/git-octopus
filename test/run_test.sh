@@ -1,6 +1,5 @@
+echo "Executing test $1..."
 docker build -t "$1" $1 1> /dev/null
-echo "============================="
-echo "TEST OUTPUT"
 echo "============================="
 docker run --cidfile="$1_cid" -i $1
 echo "============================="
