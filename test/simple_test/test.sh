@@ -1,0 +1,1 @@
+git merge features/feat1 features/feat2 features/feat3
