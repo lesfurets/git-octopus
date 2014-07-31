@@ -1,221 +1,147 @@
 #!/bin/bash
 usage() {
 cat <<EOF
-Usage:
-    [OPTION..] [<refspec>]
+NAME
+    git-octopus - Does an octopus merge based on branch naming pattern 
+Usage
+    [OPTION..] [<pattern>...] 
 
-    Exécute le merge octopus des branches remotes/origin/features origin/master et <refspec> en effectuant un checkout de <refspec> au préalable.
-    La commande commence par faire un fetch -p.
-    si <refspec> n'est pas précisé, utilise HEAD.
-    La commande laisse le repo sur la branche <refspec> à la fin de son exécution.
+DESCRIPTION
+    <pattern> can be any usual refspec or a pattern.
+    Performs an octopus merge of all commits directly listed or induced by patterns.
 
-OPTION :
-    -a, --analyse exécute un merge octopus partiel entre <refspec>, origin/master et chaque feature branch individuellement pour détecter avec quelle branch se produit le conflit.
-    --push push le commit resultant du merge (en cas de succes) sur origin octopus-features
-    -s, --stop-on-failure Stops leaving the merge unresolved
-    -h, --help, -help, help
-    --porcelain retourne uniquement le SHA1 de la branche octopus-features
+OPTION
+    -n, leaves the repository back to HEAD
 EOF
 }
 
 line_break(){
-    log "------------------------------------------------------------------------"
+    echo "-----------------------------------------------------------"
 }
 
-log(){
-    if [ $porcelain -eq 0 ]
-    then
-        echo "$1"
-    fi
-}
-
-log_porcelain(){
-    if [ $porcelain -eq 1 ]
-    then
-        : $1
-    fi
-}
-
-startPoint(){
-    line_break
-    log "Stoping..."
-    line_break
-    log "HEAD -> $triggeredBranch"
-    git reset -q --hard
-    git checkout -q $triggeredBranch
-}
-
-trap "startPoint && exit 1;" SIGINT SIGQUIT
-
-remote=`git config remote.origin.url | sed -e 's/.*git\/\(.*\)/\1/'`
+#assuming that HEAD is a symbolic ref, ie not detached
 triggeredBranch=`git symbolic-ref HEAD`
-triggeredBranch=${triggeredBranch#refs/heads/}
-octopusBranchName="octopus-features"
-doPush=0
-doAnalyse=0
-doStopOnFailure=0
-porcelain=0
 
-for param in $@
-do
-  if [ $param = '--help' ] || [ $param = '-h' ] || [ $param = '-help' ] || [ $param = 'help' ]
-  then
-    usage
-    exit 0
-  else
-    if [ $param = '--push' ]
-    then
-      doPush=1
-    else
-      if [ $param = '-a' ] || [ $param = '--analyse' ]
-      then
-        doAnalyse=1
-      else
-        if [ $param = '-s' ] || [ $param = '--stop-on-failure' ]
-        then
-          doStopOnFailure=1
-        else
-          if [ $param = '--porcelain' ]
-          then
-            porcelain=1
-          else
-            triggeredBranch=$param
-          fi
-        fi
-      fi
-    fi
-  fi
+resetRepository(){
+    echo
+    line_break
+    echo "Stoping..."
+    echo "HEAD -> $triggeredBranch"
+    git reset -q --hard
+    git checkout -q ${triggeredBranch#refs/heads/}
+}
+
+trap "resetRepository && exit 1;" SIGINT SIGQUIT
+
+while getopts "nh" opt; do
+  case "$opt" in
+    h)
+      usage
+      exit 0
+      ;;
+    n)
+      noCommit=1
+      ;;
+    \?)
+      echo "Invalid option: -$opt" >&2
+      exit 1
+      ;;
+  esac
 done
 
-line_break
-log "Infos"
-line_break
-log "Directory : `pwd`"
-log "Repository : $remote"
-log "Branch : $triggeredBranch"
-log "Commit : `git rev-parse HEAD`"
-log "Push resulting merge : $doPush"
-log "Analyse : $doAnalyse"
-log "StopOnFailure : $doStopOnFailure"
-
-line_break
-
-if [[ -n `git status --porcelain` ]]
+if [[ -n `git diff-index HEAD` ]]
 then
-    git status
-    log
-    log "Le repo doit être clean"
-    log
-    line_break
-    log "OCTOPUS FAILED"
-    line_break
+    echo "The repository has to be clean"
     exit 1
 fi
-log "Fetching ..."
-line_break
-#fetch de toutes les features
-git fetch -p
-line_break
 
-features+="$triggeredBranch origin/master "
-for branch in $(git for-each-ref --format="%(refname)" refs/remotes/origin/features)
-do
-    features+="$branch "
-done
+#Shift all options in order to iterate over refspec-patterns
+shift `expr $OPTIND - 1`
 
-log "Branches à merger :"
-log
-BRANCHF="%-10s%-10s%s\n"
-log "$( printf $BRANCHF id tag branch )"
-for branch in $features
-do
-    log "$( printf "$BRANCHF" "`git rev-parse --short $branch`" "$( git describe --tags $branch | cut -d '-' -f 1 )" "${branch#refs/}" )"
+if [ -z $@ ] ; then
+    echo "Bad use of git-octopus"
+    echo
+    usage
+    exit 1
+fi
+
+echo "Branches beeing merged :"
+for ref in `git ls-remote . $@ | cut -d $'\t' -f 2` ; do
+    echo $'\t'${ref#refs/}
+    refsToMerge+="${ref#refs/} "
 done
 
 line_break
-log "Merge octopus"
-line_break
 
-git checkout -q --detach
-git merge -q --no-edit $features
+if [ $noCommit ] ; then
+    mergeArg="--no-commit"
+fi
+
+git merge -q --no-edit $mergeArg $refsToMerge
 
 if [ $? -eq 0 ]
 then
-    if [ $doPush -eq 1 ]
+    # Octopus merge went well
+    # Resets the repository if -n was specified, let it as it is otherwise.
+    if [ $noCommit ]
     then
-        line_break
-        log "Push du merge sur octopus"
-        line_break
-        git push -f origin HEAD:$octopusBranchName
-    else
-        log
-        log "merge créé : `git rev-parse HEAD`"
-        log_porcelain "`git rev-parse HEAD`"
-        git checkout -q $triggeredBranch
-        line_break
+        git merge --abort
     fi
-    log "OCTOPUS SUCCESS"
     line_break
+    echo "OCTOPUS SUCCESS"
 else
+    # Octopus merge failed, starting to run the analysis sequence ...
     line_break
-    if [ $doStopOnFailure -eq 1 ]
-    then
-        log "OCTOPUS FAILED"
-        log "   Stopped on failure, the merge is left unresolved."
-        log "   To return to original state : git checkout -f $triggeredBranch"
-        line_break
-        exit 1
-    fi
-    if [ $doAnalyse -eq 1 ]
-    then
-        git checkout -q --detach -f $triggeredBranch
-        git reset HEAD
-        log "Recherche des branches en conflict avec $triggeredBranch..."
-        line_break
-        for branch in $features
-        do
-            if [ "$branch" != "$triggeredBranch" ] && [ "$branch" != "origin/master" ]
+   
+    git reset -q --hard HEAD
+
+    echo "Testing merges one by one with ${triggeredBranch#refs/heads/}..."
+    echo
+
+    tmpFile=`mktemp -t octopus-conflicts-output`
+
+    # Will perform a simple merge from the current branch with each branches one by one.
+    for branch in $refsToMerge
+    do
+        if [ `git rev-parse $branch` != `git rev-parse $triggeredBranch` ]
+        then
+            echo -n "merging $branch... "
+
+            #computing the best common ancestor to base the merge with
+            mergeBase=`git merge-base HEAD $branch`
+
+            # Merges the tree of the branch with the HEAD tree
+            git read-tree -um --aggressive $mergeBase HEAD $branch > /dev/null
+
+            # Doing the simple merge for conflicting paths
+            # this is what octopus merge strategy does
+            git merge-index -o -q git-merge-one-file -a 1> /dev/null 2> $tmpFile
+
+            if [ $? -eq 0 ]
             then
-                log "merge partiel :"
-                log "`git rev-parse --short $triggeredBranch`  $triggeredBranch"
-                log "`git rev-parse --short $branch`  ${branch#refs/remotes/}"
-                log "`git rev-parse --short origin/master`  origin/master"
-                log
-                #bug de git ? il faut 3 branches en parametre pour que ca se passe bien
-                git merge --no-commit -q $branch origin/master
-                if [ $? -eq 0 ]
-                then
-                    log "##teamcity[message text='Merge ${triggeredBranch#refs/heads/} ${branch#refs/remotes/origin/} origin/master: OK' ]"
-                    log "SUCCESS"
-                else
-                    git diff
-                    log "##teamcity[message errorDetails='Merge ${triggeredBranch#refs/heads/} ${branch#refs/remotes/origin/} origin/master: FAILED' status='ERROR']"
-                    log "FAILED"
-                    conflicts+="$branch "
-                fi
-                git checkout -q --detach -f $triggeredBranch
-                line_break
+                echo "SUCCESS"
+            else
+                echo "FAILED"
+                cat $tmpFile
+                git diff
+                conflicts+="$branch "
             fi
-        done
-        if [ -z "$conflicts" ]; then
-            log "Aucun conflits trouvé ! regarde sur teamcity c'est peut être pas toi qui casse l'octopus ..."
-        else
-            log "Branches en conflits avec ${triggeredBranch#refs/}"
-            for branch in $conflicts
-            do
-                log "  ${branch#refs/}"
-            done
+            git reset -q --hard
         fi
-        line_break
-    else
-        log "use git octopus --analyse/-a pour détecter avec quelle(s) branche(s) se produit le conflit"
-        line_break
-    fi
-
-    log "OCTOPUS FAILED"
+    done
+    
     line_break
 
-    git checkout -q -f $triggeredBranch
-    git reset HEAD
+    if [ -z "$conflicts" ]; then
+        echo "No conflicts found between ${triggeredBranch#refs/heads} and the rest of the branches"
+    else
+        echo "${triggeredBranch#refs/heads/} has conflicts with :"
+        for branch in $conflicts
+        do
+            echo $'\t'$branch
+        done
+    fi
+
+    echo "OCTOPUS FAILED"
     exit 1
 fi
