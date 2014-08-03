@@ -1,3 +1,4 @@
+#!/bin/bash
 echo "Executing test $1..."
 cp -Rf ../bin $1
 docker build -t "$1" $1 1> /dev/null
