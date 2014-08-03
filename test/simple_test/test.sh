@@ -1,1 +1,2 @@
-git merge features/feat1 features/feat2 features/feat3
+git status
+/home/git-octopus.sh features/*
