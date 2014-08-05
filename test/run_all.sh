@@ -1,6 +1,7 @@
 #!/bin/bash
-tests=`ls -1d *_test`
+testDir=`dirname $0`
+tests=`ls -1d $testDir/*_test`
 for test in $tests; do
-	./run_test.sh "$test"
-	echo "============================="
+	$testDir/run_test.sh "$test"
+	echo "==========================================================="
 done
