@@ -98,7 +98,7 @@ else
     echo "Testing merges one by one with ${triggeredBranch#refs/heads/}..."
     echo
 
-    tmpFile=`mktemp -t octopus-conflicts-output`
+    tmpFile=`mktemp -t octopus-conflicts-outputXXXX`
 
     # Will perform a simple merge from the current branch with each branches one by one.
     for branch in $refsToMerge

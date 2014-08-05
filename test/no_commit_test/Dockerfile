@@ -1,4 +1,4 @@
-FROM lesfurets/octopus-tests:latest
+FROM lesfurets/octopus-tests
 ADD test.sh /home/
 ADD bin /home/
 RUN chmod +x /home/test.sh
