@@ -1,6 +1,9 @@
 #!/bin/bash
-git status
-/home/git-octopus.sh features/*
+
+#FIXME
+git status &> /dev/null
+
+/home/git-octopus features/*
 merged=`git branch --merged`
 if [[ $merged != *feat1* ]] ; then
 	exit 1

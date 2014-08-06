@@ -1,9 +1,8 @@
 #!/bin/bash
-
-#FIXME
 git status &> /dev/null
 
-#saving the initial state of the repository
+git checkout --detach
+
 sha1=`git rev-parse HEAD`
 
 /home/git-octopus -n features/*
@@ -18,8 +17,10 @@ if [[ -n `git diff-index HEAD` ]] ; then
 	exit 1
 fi
 
-#should be still on master
-if [[ `git symbolic-ref HEAD` != "refs/heads/master" ]] ; then
-	echo "Should be still on master"
+#should be still detached
+git symbolic-ref HEAD &> /dev/null
+
+if [ $? -eq 0 ] ; then
+	echo "Repository should remains detached"
 	exit 1
 fi

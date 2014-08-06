@@ -11,8 +11,13 @@ line_break(){
     echo "-----------------------------------------------------------"
 }
 
-#assuming that HEAD is a symbolic ref, ie not detached
-triggeredBranch=`git symbolic-ref HEAD`
+# Save the current state of the repository in $triggeredBranch
+triggeredBranch=`git symbolic-ref HEAD &> /dev/null`
+if [ $? -eq 0 ] ; then
+    triggeredBranch=${triggeredBranch#refs/heads/}
+else
+    triggeredBranch=`git rev-parse HEAD`
+fi
 
 resetRepository(){
     echo
@@ -87,7 +92,7 @@ else
    
     git reset -q --hard HEAD
 
-    echo "Testing merges one by one with ${triggeredBranch#refs/heads/}..."
+    echo "Testing merges one by one with $triggeredBranch..."
     echo
 
     tmpFile=`mktemp -t octopus-conflicts-outputXXXX`
@@ -95,7 +100,7 @@ else
     # Will perform a simple merge from the current branch with each branches one by one.
     for branch in $refsToMerge
     do
-        if [ `git rev-parse $branch` != `git rev-parse $triggeredBranch` ]
+        if [[ `git rev-parse $branch` != `git rev-parse $triggeredBranch` ]]
         then
             echo -n "merging $branch... "
 
@@ -125,9 +130,9 @@ else
     line_break
 
     if [ -z "$conflicts" ]; then
-        echo "No conflicts found between ${triggeredBranch#refs/heads} and the rest of the branches"
+        echo "No conflicts found between $triggeredBranch and the rest of the branches"
     else
-        echo "${triggeredBranch#refs/heads/} has conflicts with :"
+        echo "$triggeredBranch has conflicts with :"
         for branch in $conflicts
         do
             echo $'\t'$branch
