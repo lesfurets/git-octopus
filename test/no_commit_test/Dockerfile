@@ -1,4 +1,4 @@
-FROM lesfurets/octopus-tests
+FROM lesfurets/octopus-tests:simple_merge_latest
 ADD test.sh /home/
 ADD bin /home/
 RUN chmod +x /home/test.sh
