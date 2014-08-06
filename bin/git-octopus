@@ -1,17 +1,9 @@
 #!/bin/bash
 usage() {
 cat <<EOF
-NAME
-    git-octopus - Does an octopus merge based on branch naming pattern 
-Usage
-    [OPTION..] [<pattern>...] 
+usage: git octopus [options] [<pattern>...]
 
-DESCRIPTION
-    <pattern> can be any usual refspec or a pattern.
-    Performs an octopus merge of all commits directly listed or induced by patterns.
-
-OPTION
-    -n, leaves the repository back to HEAD
+    -n     leaves the repository back to HEAD
 EOF
 }
 
@@ -28,7 +20,7 @@ resetRepository(){
     echo "Stoping..."
     echo "HEAD -> $triggeredBranch"
     git reset -q --hard
-    git checkout -q ${triggeredBranch#refs/heads/}
+    git checkout -q $triggeredBranch
 }
 
 trap "resetRepository && exit 1;" SIGINT SIGQUIT
