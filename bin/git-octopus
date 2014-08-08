@@ -55,15 +55,24 @@ fi
 #Shift all options in order to iterate over refspec-patterns
 shift `expr $OPTIND - 1`
 
-#exit if there is no branches to merge.
-if [ -z $@ ] ; then
+#Retrive patterns written in the conf
+patterns=`git config --get-all octopus.pattern`
+
+#Overriding the conf with the patterns given as parameters
+if [[ -n "$@" ]] ; then
+    patterns=$@
+fi
+
+#Exit code 0 if nothing to merge
+if [[ -z "$patterns" ]] ; then
     exit 0
 fi
 
+branches=`git ls-remote . $patterns | cut -d $'\t' -f 2`
+
 echo "Branches beeing merged :"
-for ref in `git ls-remote . $@ | cut -d $'\t' -f 2` ; do
-    echo $'\t'${ref#refs/}
-    refsToMerge+="${ref#refs/} "
+for branch in $branches ; do
+    echo $'\t'$branch
 done
 
 line_break
@@ -72,7 +81,7 @@ if [ $noCommit ] ; then
     mergeArg="--no-commit"
 fi
 
-git merge -q --no-edit $mergeArg $refsToMerge
+git merge -q --no-edit $mergeArg $branches
 
 if [ $? -eq 0 ]
 then
@@ -96,7 +105,7 @@ else
     tmpFile=`mktemp -t octopus-conflicts-outputXXXX`
 
     # Will perform a simple merge from the current branch with each branches one by one.
-    for branch in $refsToMerge
+    for branch in $branches
     do
         if [[ `git rev-parse $branch` != `git rev-parse $triggeredBranch` ]]
         then
