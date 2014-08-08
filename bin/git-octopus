@@ -55,11 +55,9 @@ fi
 #Shift all options in order to iterate over refspec-patterns
 shift `expr $OPTIND - 1`
 
+#exit if there is no branches to merge.
 if [ -z $@ ] ; then
-    echo "Bad use of git-octopus"
-    echo
-    usage
-    exit 1
+    exit 0
 fi
 
 echo "Branches beeing merged :"
