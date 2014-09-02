@@ -112,7 +112,7 @@ else
             echo -n "merging $branch... "
 
             #computing the best common ancestor to base the merge with
-            mergeBase=`git merge-base HEAD $branch`
+            mergeBase=`git merge-base --all HEAD $branch`
 
             # Merges the tree of the branch with the HEAD tree
             git read-tree -um --aggressive $mergeBase HEAD $branch > /dev/null
