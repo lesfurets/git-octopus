@@ -30,6 +30,8 @@ resetRepository(){
 
 trap "resetRepository && exit 1;" SIGINT SIGQUIT
 
+doCommit=`git config octopus.commit`
+
 while getopts "nh" opt; do
   case "$opt" in
     h)
@@ -37,7 +39,7 @@ while getopts "nh" opt; do
       exit 0
       ;;
     n)
-      noCommit=1
+      doCommit=false
       ;;
     \?)
       echo "Invalid option: -$opt" >&2
@@ -77,7 +79,7 @@ done
 
 line_break
 
-if [ $noCommit ] ; then
+if ! $doCommit ; then
     mergeArg="--no-commit"
 fi
 
@@ -87,7 +89,7 @@ if [ $? -eq 0 ]
 then
     # Octopus merge went well
     # Resets the repository if -n was specified, let it as it is otherwise.
-    if [ $noCommit ]
+    if ! $doCommit
     then
         git merge --abort
     fi
