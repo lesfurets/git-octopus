@@ -1,0 +1,83 @@
+'\" t
+.\"     Title: git-octopus
+.\"    Author: [FIXME: author] [see http://docbook.sf.net/el/author]
+.\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
+.\"      Date: 12/23/2014
+.\"    Manual: \ \&
+.\"    Source: \ \&
+.\"  Language: English
+.\"
+.TH "GIT\-OCTOPUS" "1" "12/23/2014" "\ \&" "\ \&"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+git-octopus \- extends git\-merge with branch naming patterns\&.
+.SH "SYNOPSIS"
+.sp
+git octopus [\-n] [<pattern>\&...]
+.SH "DESCRIPTION"
+.sp
+<pattern> can be any usual refspec or a naming pattern\&. Patterns are resolved using git\-ls\-remote, the resulting refs are given to git\-merge\&.
+.sp
+In case of a merge failure, iterates over all the refs, computing merges with each ref (from HEAD) one by one for diagnosic purpose\&.
+.SH "OPTIONS"
+.PP
+\-n
+.RS 4
+Leaves the repository back to HEAD\&.
+.RE
+.SH "EXAMPLES"
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Merge check of the current branch with all feature branches and the master from origin:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+$ git octopus \-n origin/features/* origin/master
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+This is basically a merge check command you would do before pushing your branch\&.
+.RE
+.SH "CONFIGURATION"
+.PP
+octopus\&.commit
+.RS 4
+true by default\&. set to false behaves like \-n
+.RE
+.PP
+octopus\&.pattern
+.RS 4
+Defines a branch naming pattern\&. Use multiple lines to define several patterns\&. See git\-config\&.
+.RE
+.SH "SEE ALSO"
+.sp
+git\-merge, git\-ls\-remote
