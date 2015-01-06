@@ -5,7 +5,7 @@ git status &> /dev/null
 
 sha1=`git rev-parse HEAD`
 
-/home/git-octopus -n features/*
+git octopus -n features/*
 
 if [ $? -ne 1 ] ; then
 	exit 1

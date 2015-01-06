@@ -3,7 +3,7 @@
 #FIXME
 git status &> /dev/null
 
-/home/git-octopus features/*
+git octopus features/*
 merged=`git branch --merged`
 if [[ $merged != *feat1* ]] ; then
 	exit 1

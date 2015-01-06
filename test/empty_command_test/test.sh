@@ -6,7 +6,7 @@ git status &> /dev/null
 #saving the initial state of the repository
 sha1=`git rev-parse HEAD`
 
-/home/git-octopus
+git octopus
 
 if [ $? -ne 0 ] ; then
 	exit 1

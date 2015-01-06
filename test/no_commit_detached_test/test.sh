@@ -5,7 +5,7 @@ git checkout --detach
 
 sha1=`git rev-parse HEAD`
 
-/home/git-octopus -n features/*
+git octopus -n features/*
 
 #should be back to HEAD
 if [[ `git rev-parse HEAD` != $sha1 ]] ; then

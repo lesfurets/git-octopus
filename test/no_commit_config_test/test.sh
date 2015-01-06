@@ -7,7 +7,7 @@ git config octopus.commit false
 #saving the initial state of the repository
 sha1=`git rev-parse HEAD`
 
-/home/git-octopus features/*
+git octopus features/*
 
 #should be back to HEAD
 if [[ `git rev-parse HEAD` != $sha1 ]] ; then

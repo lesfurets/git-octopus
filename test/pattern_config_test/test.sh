@@ -7,7 +7,7 @@ git checkout features/feat1
 git config octopus.pattern features/*
 git config --add octopus.pattern master
 
-/home/git-octopus
+git octopus
 merged=`git branch --merged`
 if [[ $merged != *feat1* ]] ; then
 	exit 1
