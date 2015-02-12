@@ -2,7 +2,7 @@
 
 >git-octopus - extends git-merge with branch naming patterns.
 
-See git-octopus' [documentation](doc/git-octopus.1.txt) for more information.
+See git-octopus' [documentation](http://lesfurets.github.io/git-octopus/doc/git-octopus.html) for more information.
 
 ##Installation
 Clone this repository and add the bin/ directory to the PATH.
