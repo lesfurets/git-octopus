@@ -16,7 +16,7 @@ triggeredBranch=`git symbolic-ref HEAD 2> /dev/null`
 if [ $? -eq 0 ] ; then
     triggeredBranch=${triggeredBranch#refs/heads/}
 else
-    triggeredBranch=`git rev-parse HEAD`
+    triggeredBranch=$(git rev-parse HEAD)
 fi
 
 resetRepository(){
@@ -30,7 +30,7 @@ resetRepository(){
 
 trap "resetRepository && exit 1;" SIGINT SIGQUIT
 
-doCommit=`git config octopus.commit`
+doCommit=$(git config octopus.commit)
 
 while getopts "nh" opt; do
   case "$opt" in
@@ -48,7 +48,7 @@ while getopts "nh" opt; do
   esac
 done
 
-if [[ -n `git diff-index HEAD` ]]
+if [[ -n $(git diff-index HEAD) ]]
 then
     echo "The repository has to be clean"
     exit 1
@@ -58,7 +58,7 @@ fi
 shift `expr $OPTIND - 1`
 
 #Retrive patterns written in the conf
-patterns=`git config --get-all octopus.pattern`
+patterns=$(git config --get-all octopus.pattern)
 
 #Overriding the conf with the patterns given as parameters
 if [[ -n "$@" ]] ; then
@@ -70,7 +70,7 @@ if [[ -z "$patterns" ]] ; then
     exit 0
 fi
 
-branches=`git ls-remote . $patterns | cut -d $'\t' -f 2`
+branches=$(git ls-remote . $patterns | cut -d $'\t' -f 2)
 
 echo "Branches beeing merged :"
 for branch in $branches ; do
@@ -109,12 +109,12 @@ else
     # Will perform a simple merge from the current branch with each branches one by one.
     for branch in $branches
     do
-        if [[ `git rev-parse $branch` != `git rev-parse $triggeredBranch` ]]
+        if [[ $(git rev-parse $branch) != $(git rev-parse $triggeredBranch) ]]
         then
-            echo -n "merging $branch... "
+            echo -n "merging $branch ... "
 
             #computing the best common ancestor to base the merge with
-            mergeBase=`git merge-base --all HEAD $branch`
+            mergeBase=$(git merge-base --all HEAD $branch)
 
             # Merges the tree of the branch with the HEAD tree
             git read-tree -um --aggressive $mergeBase HEAD $branch > /dev/null
