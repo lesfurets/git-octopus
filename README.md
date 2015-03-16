@@ -2,6 +2,8 @@
 >git-octopus - extends git-merge with branch naming patterns.
 
 ##Installation
+We support divers unix distributions, OSX and cygwin.
+The installation procedure is the same on all systems.
 Clone this repository and add the bin/ directory to the PATH.
 
 ##Usage

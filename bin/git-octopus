@@ -104,7 +104,7 @@ else
     echo "Testing merges one by one with $triggeredBranch..."
     echo
 
-    tmpFile=`mktemp -t octopus-conflicts-outputXXXX`
+    tmpFile=
 
     # Will perform a simple merge from the current branch with each branches one by one.
     for branch in $branches
@@ -121,14 +121,14 @@ else
 
             # Doing the simple merge for conflicting paths
             # this is what octopus merge strategy does
-            git merge-index -o -q git-merge-one-file -a 1> /dev/null 2> $tmpFile
+            tmpFile=$(git merge-index -o -q git-merge-one-file -a 2>&1)
 
             if [ $? -eq 0 ]
             then
                 echo "SUCCESS"
             else
                 echo "FAILED"
-                cat $tmpFile
+                echo $tmpFile
                 git diff
                 conflicts+="$branch "
             fi
