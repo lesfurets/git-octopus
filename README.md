@@ -2,9 +2,9 @@
 >git-octopus - extends git-merge with branch naming patterns.
 
 ##Installation
-We support divers unix distributions, OSX and cygwin.
-The installation procedure is the same on all systems.
-Clone this repository and add the bin/ directory to the PATH.
+We support divers unix distributions, OSX and cygwin. The installation procedure is the same on all operating systems.
+
+Download the latest release in the [release](https://github.com/lesfurets/git-octopus/releases) section or clone this repository (please checkout the latest release tag, not the master branch) and add the bin/ directory to the PATH.
 
 ##Usage
 The main purpose of the command is to merge branches based on naming patterns
