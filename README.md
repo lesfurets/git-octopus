@@ -26,9 +26,9 @@ Note that when an octopus fails, it doesn't necessarily mean that a given branch
 ##Continuous integration
 git-octopus is meant to be used in a continuous integration build flow. The goal is to merge all the branches the developpers are working on. 
 
-The implementation in a command line job is pretty straight forward
+The implementation in a command line job is pretty straight forward.
 ```
-#Usually, the CI fetches only the branch the job has been started on, so we need to fetch the rest
+#Depending on the CI you use, if the job fetches the trigger branch only, you may need to fetch all the branches.
 git fetch -p
 
 #Lets merge feature branches and the master from origin
