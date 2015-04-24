@@ -6,6 +6,17 @@ We support divers unix distributions, OSX and cygwin. The installation procedure
 
 Download the latest release in the [release](https://github.com/lesfurets/git-octopus/releases) section or clone this repository (please checkout the latest release tag, not the master branch) and add the bin/ directory to the PATH.
 
+###Alternate OSX Installation
+
+If you know and use [Homebrew](http://brew.sh), you may just need to do:
+```
+brew install git-octopus
+```
+If that fails, you may need to update your [Homebrew](http://brew.sh) prior to trying the install:
+```
+brew update
+```
+
 ##Usage
 The main purpose of the command is to merge branches based on naming patterns
 ```
