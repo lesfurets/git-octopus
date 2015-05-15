@@ -1,0 +1,71 @@
+#!/bin/bash
+usage() {
+cat <<EOF
+usage: git store-conflict 
+
+    -m     merges the status into OCTOPUS_CONFLICT_STORE.
+EOF
+}
+
+tmp=$(git rev-parse --git-dir)/OCTOPUS_CONFLICT_STORE
+
+merge=false
+
+while getopts "hm" opt; do
+	case "$opt" in
+	h)
+		usage
+		exit 0
+	;;
+	m)
+		merge=true
+	;;
+	esac
+done
+
+if $merge && [ ! -f $tmp ] ; then
+	echo "No conflict has been previously recorded" >&2
+	exit 1
+fi
+
+if ! $merge && [ -f $tmp ] ; then
+	echo "You are in the middle of a resolution"
+	exit 1
+fi
+
+if ! $merge ; then
+	# catch conflicting paths
+	# git status --porcelain | grep "^U.\|^.U\|^AA\|^DD" > $tmp
+	git ls-files --unmerged > $tmp
+	# coller le sh1 direct plutot que de garder tout le bordel
+else 
+	if [ -z "$(git ls-files --unmerged)" ] ; then
+		# if all conflicts are resolved ...
+		tree=$(git write-tree)
+		commit=$(git commit-tree $tree -m "dudu")
+		# TODO créer la ref à partir de $tmp
+		echo $commit
+	else
+		echo "All conflict must be resolved"
+		exit 1
+	fi
+fi
+
+exit 0
+
+git status --porcelain | \
+while read l ; do
+	state=$(echo $l | awk '{print $1;}')
+	path=$(echo $l | awk '{print $2;}')
+	case $state in
+    UU)
+		if  ! $merge ; then 
+			echo "$state $path" >> $tmp
+			# add conflict sha1
+		fi
+	;;
+    *)
+	;;
+    esac
+    
+done
