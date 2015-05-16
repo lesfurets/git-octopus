@@ -1,0 +1,55 @@
+#!/bin/bash
+usage() {
+cat <<EOF
+usage: git hash-conflict
+EOF
+}
+
+LF='
+'
+
+function cat-UU-conflict() {
+	leftContent=
+	rightContent=
+	reading="base"
+
+	while read l ; do 
+		echo $l | grep '^<<<<<<<' 1> /dev/null && reading="left" && continue
+		echo $l | grep '^=======' 1> /dev/null && reading="right" && continue
+		echo $l | grep '^>>>>>>>' 1> /dev/null && reading="base" && continue
+
+		case $reading in
+			"base")
+			;;
+			"left")
+				leftContent+="$l$LF"
+			;;
+			"right")
+				rightContent+="$l$LF"
+			;;
+		esac
+	done < $1
+
+	conflictContent=
+	if [ "$leftContent" \< "$rightContent" ] ; then
+		conflictContent="$leftContent$LF$rightContent"
+	else
+		conflictContent="$rightContent$LF$leftContent"
+	fi
+
+	echo "$conflictContent"
+}
+
+conflictContent=
+
+while read status ; do
+	state=$(echo $status | awk '{print $1;}')
+	path=$(echo $status | awk '{print $2;}')
+	case $state in
+	    "UU")
+			conflictContent+="$(cat-UU-conflict $path)$LF"
+		;;
+    esac
+done <<< "$(git status --porcelain | grep "^U.\|^.U\|^AA\|^DD")"
+
+echo "$conflictContent" | shasum -p | cut -f 1 -d " "
