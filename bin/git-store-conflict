@@ -34,38 +34,20 @@ if ! $merge && [ -f $tmp ] ; then
 fi
 
 if ! $merge ; then
-	# catch conflicting paths
-	# git status --porcelain | grep "^U.\|^.U\|^AA\|^DD" > $tmp
-	git ls-files --unmerged > $tmp
-	# coller le sh1 direct plutot que de garder tout le bordel
+	if [ -z "$(git ls-files --unmerged)" ] ; then
+		echo "No conflicts to store" >&2
+		exit 1
+	fi
+	git hash-conflict > $tmp
 else 
 	if [ -z "$(git ls-files --unmerged)" ] ; then
 		# if all conflicts are resolved ...
 		tree=$(git write-tree)
 		commit=$(git commit-tree $tree -m "dudu")
-		# TODO créer la ref à partir de $tmp
-		echo $commit
+		git update-ref "refs/conflicts/$(cat $tmp)" "$commit" ""
+		echo "$commit -> refs/conflicts/$(cat $tmp)" 
 	else
 		echo "All conflict must be resolved"
 		exit 1
 	fi
 fi
-
-exit 0
-
-git status --porcelain | \
-while read l ; do
-	state=$(echo $l | awk '{print $1;}')
-	path=$(echo $l | awk '{print $2;}')
-	case $state in
-    UU)
-		if  ! $merge ; then 
-			echo "$state $path" >> $tmp
-			# add conflict sha1
-		fi
-	;;
-    *)
-	;;
-    esac
-    
-done
