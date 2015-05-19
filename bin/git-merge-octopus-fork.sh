@@ -89,8 +89,16 @@ do
 	if test $? -ne 0
 	then
 		echo "Simple merge did not work, trying automatic merge."
-		git-merge-index -o git-merge-one-file -a ||
-		OCTOPUS_FAILURE=1
+		git-merge-index -o git-merge-one-file -a 2> /dev/null
+
+		if test $? -ne 0
+		then
+			conflictHash=$(git hash-conflict)
+			git show-ref -q --verify "refs/conflicts/$conflictHash" && 
+				echo "Applying conflict resolution $conflictHash"
+			OCTOPUS_FAILURE=1
+		fi
+
 		next=$(git write-tree 2>/dev/null)
 	fi
 
