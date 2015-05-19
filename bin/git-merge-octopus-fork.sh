@@ -33,14 +33,6 @@ do
 	esac
 done
 
-# Reject if this is not an Octopus -- resolve should be used instead.
-case "$remotes" in
-?*' '?*)
-	;;
-*)
-	exit 2 ;;
-esac
-
 # MRC is the current "merge reference commit"
 # MRT is the current "merge result tree"
 

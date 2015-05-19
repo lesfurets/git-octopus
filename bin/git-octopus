@@ -129,7 +129,7 @@ else
             # mergeBase=$(git merge-base --all HEAD $branch)
             mergeBase=
 
-            sha1=$(git rev-parse --verify $branch)
+            sha1=$(git rev-parse --verify "$branch")
             tmpFile=$(git-merge-octopus-fork.sh "$mergeBase" -- HEAD $sha1 2>&1)
 
             if [ $? -eq 0 ]
@@ -137,7 +137,7 @@ else
                 echo "SUCCESS"
             else
                 echo "FAILED"
-                echo $tmpFile
+                echo "$tmpFile"
                 git diff
                 conflicts+="$branch "
             fi
