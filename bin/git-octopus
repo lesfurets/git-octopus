@@ -12,7 +12,7 @@ line_break(){
 }
 
 # Save the current state of the repository in $triggeredBranch
-triggeredBranch=`git symbolic-ref HEAD 2> /dev/null`
+triggeredBranch=$(git symbolic-ref HEAD 2> /dev/null)
 if [ $? -eq 0 ] ; then
     triggeredBranch=${triggeredBranch#refs/heads/}
 else
@@ -55,7 +55,7 @@ then
 fi
 
 #Shift all options in order to iterate over refspec-patterns
-shift `expr $OPTIND - 1`
+shift $(expr $OPTIND - 1)
 
 #Retrive patterns written in the conf
 patterns=$(git config --get-all octopus.pattern)
@@ -79,19 +79,31 @@ done
 
 line_break
 
-if ! $doCommit ; then
-    mergeArg="--no-commit"
-fi
+mergeBases= sha1s= octopusMessage=
+for branch in $branches
+do
+    sha1=$(git rev-parse --verify "$branch")
+    sha1s="$sha1s $sha1"
+    eval GITHEAD_$sha1='"$branch"'
+    export GITHEAD_$sha1
 
-git merge -q --no-edit $mergeArg $branches
+    # merges bases are not used in the octopus stategy so we don't need to compute them
+    # mergeBases="$mergeBases`git merge-base --all HEAD $branch` "
+
+    octopusMessage+="$branch$LF"
+done
+
+git-merge-octopus-fork.sh "$mergeBases" -- HEAD $sha1s
 
 if [ $? -eq 0 ]
 then
-    # Octopus merge went well
-    # Resets the repository if -n was specified, let it as it is otherwise.
-    if ! $doCommit
-    then
-        git merge --abort
+    if $doCommit ; then
+        tree=$(git write-tree)
+        head=$(git rev-parse --verify HEAD)
+        commit=$(git commit-tree -p $head ${sha1s// / -p } -m "$octopusMessage" $tree)
+        git update-ref HEAD $commit
+    else
+        git reset -q --hard
     fi
     line_break
     echo "OCTOPUS SUCCESS"
@@ -113,15 +125,12 @@ else
         then
             echo -n "merging $branch ... "
 
-            #computing the best common ancestor to base the merge with
-            mergeBase=$(git merge-base --all HEAD $branch)
+            # merge base is not used in the octopus strategy
+            # mergeBase=$(git merge-base --all HEAD $branch)
+            mergeBase=
 
-            # Merges the tree of the branch with the HEAD tree
-            git read-tree -um --aggressive $mergeBase HEAD $branch > /dev/null
-
-            # Doing the simple merge for conflicting paths
-            # this is what octopus merge strategy does
-            tmpFile=$(git merge-index -o -q git-merge-one-file -a 2>&1)
+            sha1=$(git rev-parse --verify $branch)
+            tmpFile=$(git-merge-octopus-fork.sh "$mergeBase" -- HEAD $sha1 2>&1)
 
             if [ $? -eq 0 ]
             then
