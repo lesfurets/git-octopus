@@ -1,53 +1,88 @@
 #!/bin/bash
+LF='
+'
+
+die () {
+    echo >&2 "$*"
+    exit 1
+}
+
 usage() {
 cat <<EOF
 usage: git store-conflict 
 
-    -m     merges the status into OCTOPUS_CONFLICT_STORE.
+    -c     commit the merge in a ref named with the signature of the conflict in refs/conflicts/.
 EOF
 }
 
-tmp=$(git rev-parse --git-dir)/OCTOPUS_CONFLICT_STORE
+gitDir=$(git rev-parse --git-dir)
+conflictName="${gitDir}/CONFLICT_NAME"
+mergeHead="${gitDir}/MERGE_HEAD"
 
-merge=false
+commit=false
 
-while getopts "hm" opt; do
+while getopts "hc" opt; do
 	case "$opt" in
 	h)
 		usage
 		exit 0
 	;;
-	m)
-		merge=true
+	c)
+		commit=true
+	;;
+	*)
+		usage
+		exit 1
 	;;
 	esac
 done
 
-if $merge && [ ! -f $tmp ] ; then
-	echo "No conflict has been previously recorded" >&2
+if $commit && [ ! -f $conflictName ] ; then
+	echo "There is no resolution ongoing." >&2
 	exit 1
 fi
 
-if ! $merge && [ -f $tmp ] ; then
+if ! $commit && [ -f $conflictName ] ; then
 	echo "You are in the middle of a resolution"
 	exit 1
 fi
 
-if ! $merge ; then
-	if [ -z "$(git ls-files --unmerged)" ] ; then
-		echo "No conflicts to store" >&2
+if ! $commit ; then
+
+	if [[ -n $(git diff-index HEAD) ]]
+	then
+	    die "The repository has to be clean"
+	fi
+
+	shift $(expr $OPTIND - 1)
+
+	if [[ -n "$@" ]] ; then
+	    remote=$@
+	    git show-ref -q "$remote" || die "Ref not found : $remote"
+	    echo $(git rev-parse $remote) > $mergeHead
+	    git-merge-octopus-fork.sh "" -- HEAD $(git rev-parse $remote) && 
+	    	(git reset -q --hard ; echo "No conflict with $remote" ; exit 0)
+
+	    git hash-conflict > $conflictName
+	else
+		usage
 		exit 1
 	fi
-	git hash-conflict > $tmp
+	
 else 
 	if [ -z "$(git ls-files --unmerged)" ] ; then
 		# if all conflicts are resolved ...
 		tree=$(git write-tree)
-		commit=$(git commit-tree $tree -m "dudu")
-		git update-ref "refs/conflicts/$(cat $tmp)" "$commit" ""
-		echo "$commit -> refs/conflicts/$(cat $tmp)" 
+		commit=$(git commit-tree $tree -m "dudu" -p HEAD -p $(cat $mergeHead))
+		conflictName="refs/conflicts/$(cat $conflictName)"
+		git update-ref "$conflictName" "$commit" "" &> /dev/null || 
+			die "Resolution $conflictName already exists. "\
+			"If you want to override it, delete it first :${LF}git update-ref -d $conflictName"
+		echo "$commit -> $conflictName" 
+		rm $mergeHead $conflictName
+		git reset -q --hard
 	else
-		echo "All conflict must be resolved"
+		echo "All conflicts must be resolved"
 		exit 1
 	fi
 fi
