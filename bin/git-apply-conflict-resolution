@@ -1,0 +1,60 @@
+#!/bin/bash
+LF='
+'
+
+die () {
+    echo >&2 "$*"
+    exit 1
+}
+
+conflictName=$(git hash-conflict)
+
+git show-ref -q --verify "refs/conflicts/$conflictName" \
+	|| die "No resolution found for $conflictName"
+
+echo "Applying conflict resolution $conflictName"
+
+resolutionCommit=$(git rev-parse "refs/conflicts/$conflictName")
+
+SUCCESS=true
+
+while read status ; do
+	state=$(echo $status | awk '{print $1;}')
+	path=$(echo $status | awk '{print $2;}')
+	case $state in
+	    "UU")
+			# TODO gérer la commutativité
+
+			# Clean conflict markers
+			sed -i "" -e "s/<<<<<<<.*/<<<<<<< /g" -e "s/>>>>>>>.*/>>>>>>> /g" $path
+
+			# Store the current preimage
+			current_preimage=$(git unpack-file $(git hash-object -w $path))
+
+			# Compute the preimage as it was when the resolution was recorded
+			leftParent=$(git rev-parse ${resolutionCommit}^1)
+			rightParent=$(git rev-parse ${resolutionCommit}^2)
+			commonAncestor=$(git merge-base $leftParent $rightParent)
+
+			leftFile=$(git unpack-file $(git ls-tree $leftParent $path | awk '{print $3;}'))
+			rightFile=$(git unpack-file $(git ls-tree $rightParent $path | awk '{print $3;}'))
+			ancestorFile=$(git unpack-file $(git ls-tree $commonAncestor $path | awk '{print $3;}'))
+			
+			# TODO mettre dans un tmp
+			recorded_preimage=$(git unpack-file $(git merge-file -L "" -L "" -L "" --stdout $leftFile $ancestorFile $rightFile | git hash-object --stdin -w))
+
+			# Do the final merge between the initial conflict, the current conflict and the resolution
+			# This is based on what is done in rerere.c
+			resolutonFile=$(git unpack-file $(git ls-tree $resolutionCommit $path | awk '{print $3;}'))
+
+			git merge-file --stdout $current_preimage $recorded_preimage $resolutonFile > $path \
+				&& git update-index --add $path \
+				|| SUCCESS=false
+
+			rm $current_preimage $leftFile $rightFile $ancestorFile $recorded_preimage $resolutonFile
+
+		;;
+    esac
+done <<< "$(git status --porcelain | grep "^U.\|^.U\|^AA\|^DD")"
+
+if ! $SUCCESS ; then die "Outdated conflict resolution $conflictName" ; fi

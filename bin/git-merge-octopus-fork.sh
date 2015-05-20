@@ -93,10 +93,7 @@ do
 
 		if test $? -ne 0
 		then
-			conflictHash=$(git hash-conflict)
-			git show-ref -q --verify "refs/conflicts/$conflictHash" && 
-				echo "Applying conflict resolution $conflictHash"
-			OCTOPUS_FAILURE=1
+			git apply-conflict-resolution || OCTOPUS_FAILURE=1
 		fi
 
 		next=$(git write-tree 2>/dev/null)
