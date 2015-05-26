@@ -2,11 +2,35 @@
 usage() {
 cat <<EOF
 usage: git hash-conflict
+
+    -o         Make the order between left and right side matters.
+    -i <file>  Read <file> instead of conflicting paths in the index  
 EOF
 }
 
 LF='
 '
+
+ordered=false
+file=
+while getopts "oi:h" opt; do
+	case "$opt" in
+	h)
+		usage
+		exit 0
+	;;
+	o)
+		ordered=true
+	;;
+	i)
+		file=$OPTARG
+	;;
+	*)
+		usage
+		exit 1
+	;;
+	esac
+done
 
 function cat-UU-conflict() {
 	leftContent=
@@ -31,7 +55,7 @@ function cat-UU-conflict() {
 	done < $1
 
 	conflictContent=
-	if [ "$leftContent" \< "$rightContent" ] ; then
+	if ! $ordered && [ "$leftContent" \< "$rightContent" ] ; then
 		conflictContent="$leftContent$LF$rightContent"
 	else
 		conflictContent="$rightContent$LF$leftContent"
@@ -50,6 +74,7 @@ while read status ; do
 			conflictContent+="$(cat-UU-conflict $path)$LF"
 		;;
     esac
-done <<< "$(git status --porcelain | grep "^U.\|^.U\|^AA\|^DD")"
+done <<< "$(if [ -z "$file" ] ; then echo "$(git status --porcelain | grep "^U.\|^.U\|^AA\|^DD")" ; else echo "UU $file" ; fi)"
+
 
 echo "$conflictContent" | shasum -p | cut -f 1 -d " "
