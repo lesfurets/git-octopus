@@ -6,6 +6,7 @@ usage: git octopus [options] [<pattern>...]
 
     -n     leaves the repository back to HEAD
 EOF
+exit
 }
 
 line_break(){
@@ -37,7 +38,6 @@ while getopts "nh" opt; do
   case "$opt" in
     h)
       usage
-      exit 0
       ;;
     n)
       doCommit=false

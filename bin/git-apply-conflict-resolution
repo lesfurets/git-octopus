@@ -1,6 +1,15 @@
 #!/bin/bash
 . $(dirname $0)/lib/hash-conflict
 
+#Resolve conflicts marked in the index. Files in conflict must have been merged already with git-merge-index
+usage() {
+cat <<EOF
+usage: git apply-conflict-resolution
+   or: git apply-conflict-resolution <commit>
+EOF
+exit
+}
+
 LF='
 '
 
@@ -9,10 +18,19 @@ die () {
     exit 1
 }
 
-conflictName=$(hash-conflict)
+[ "$1" == "-h" ] && usage
 
-git show-ref -q --verify "refs/conflicts/$conflictName" \
-	|| die "No resolution found for $conflictName"
+conflictName=
+
+if [ "$1" ] ; then
+	git show-ref -q --verify "$1" || die "Ref not found: $1"
+	conflictName=$1 
+else
+	#Reading from the index
+	conflictName=$(hash-conflict)
+
+	git show-ref -q --verify "refs/conflicts/$conflictName" || exit 1
+fi
 
 echo "Applying conflict resolution $conflictName"
 

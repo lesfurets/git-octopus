@@ -8,6 +8,7 @@ usage: git conflict <commit>
    or: git conflict -l
    or: git conflict -d <conflictRef>
 EOF
+exit
 }
 
 die () {
