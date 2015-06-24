@@ -1,5 +1,5 @@
 #!/bin/bash
-#. lib/lib
+
 usage() {
 cat <<EOF
 usage: git conflict 
@@ -83,6 +83,7 @@ case "$1" in
 			exit 0
 		fi
 
-	    git hash-conflict > $conflictName
+		. $(dirname $0)/lib/hash-conflict
+	    hash-conflict > $conflictName
 	;;
 esac

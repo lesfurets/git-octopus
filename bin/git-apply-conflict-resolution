@@ -1,4 +1,6 @@
 #!/bin/bash
+. $(dirname $0)/lib/hash-conflict
+
 LF='
 '
 
@@ -7,7 +9,7 @@ die () {
     exit 1
 }
 
-conflictName=$(git hash-conflict)
+conflictName=$(hash-conflict)
 
 git show-ref -q --verify "refs/conflicts/$conflictName" \
 	|| die "No resolution found for $conflictName"
@@ -40,7 +42,7 @@ while read status ; do
 			# TODO mettre dans un tmp
 			recorded_preimage=$(git unpack-file $(git merge-file -L "" -L "" -L "" --stdout $leftFile $ancestorFile $rightFile | git hash-object --stdin -w))
 
-			if [ "$(git hash-conflict -o -i $current_preimage)" != "$(git hash-conflict -o -i $recorded_preimage)" ] ; then
+			if [ "$(hash-conflict -o -i $current_preimage)" != "$(hash-conflict -o -i $recorded_preimage)" ] ; then
 				recorded_preimage=$(git unpack-file $(git merge-file -L "" -L "" -L "" --stdout $rightFile $ancestorFile $leftFile | git hash-object --stdin -w))
 			fi
 
