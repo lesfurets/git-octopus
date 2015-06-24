@@ -60,8 +60,18 @@ if ! $commit ; then
 	    remote=$@
 	    git show-ref -q "$remote" || die "Ref not found : $remote"
 	    echo $(git rev-parse $remote) > $mergeHead
-	    git-merge-octopus-fork.sh "" -- HEAD $(git rev-parse $remote) && 
-	    	(git reset -q --hard ; echo "No conflict with $remote" ; exit 0)
+
+	    common=$(git merge-base --all $remote HEAD)
+
+	    git read-tree -u -m --aggressive $common HEAD $remote
+	    
+	    git-merge-index -o git-merge-one-file -a 2> /dev/null
+
+	    if test $? -eq 0 ; then
+			git reset -q --hard
+			echo "No conflict with $remote"
+			exit 0
+		fi
 
 	    git hash-conflict > $conflictName
 	else
@@ -79,7 +89,7 @@ else
 			die "Resolution $conflictName already exists. "\
 			"If you want to override it, delete it first :${LF}git update-ref -d $conflictName"
 		echo "$commit -> $conflictName" 
-		rm $mergeHead $conflictName
+		rm $mergeHead $conflictName &> /dev/null
 		git reset -q --hard
 	else
 		echo "All conflicts must be resolved"

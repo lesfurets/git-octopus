@@ -26,8 +26,6 @@ while read status ; do
 	path=$(echo $status | awk '{print $2;}')
 	case $state in
 	    "UU")
-			# TODO gérer la commutativité
-
 			# Clean conflict markers
 			sed -i "" -e "s/<<<<<<<.*/<<<<<<< /g" -e "s/>>>>>>>.*/>>>>>>> /g" $path
 
