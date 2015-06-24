@@ -1,0 +1,88 @@
+#!/bin/bash
+#. lib/lib
+usage() {
+cat <<EOF
+usage: git conflict 
+
+EOF
+}
+
+die () {
+    echo >&2 "$*"
+    exit 1
+}
+
+# git conflict -l
+# git conflict ref
+# git conflict --commit
+# git conflict --abort
+# git conflict -d conflictName
+
+gitDir=$(git rev-parse --git-dir)
+conflictName="${gitDir}/CONFLICT_NAME"
+mergeHead="${gitDir}/MERGE_HEAD"
+
+cleanup () {
+	rm $conflictName $mergeHead &> /dev/null
+}
+
+case "$1" in
+    --commit)
+		[ ! -f $conflictName ] && die "There is no resolution ongoing."
+
+		[ -z "$(git ls-files --unmerged)" ]  || die "All conflicts must be resolved"
+		# if all conflicts are resolved ...
+		tree=$(git write-tree)
+		commit=$(git commit-tree $tree -m "dudu" -p HEAD -p $(cat $mergeHead))
+		conflictRef="refs/conflicts/$(cat $conflictName)"
+		git update-ref "$conflictRef" "$commit" "" &> /dev/null || 
+			die "Resolution $conflictRef already exists. "\
+			"If you want to override it, delete it first :${LF}git conflict -d $conflictRef"
+		echo "Conflict resolution created: $conflictRef" 
+		cleanup
+		git reset -q --hard
+    ;;
+    --abort)
+		
+		git reset -q --hard
+		cleanup
+		exit 0
+    ;;
+    -*)
+    	while getopts "ld:" opt; do
+	  		case "$opt" in
+	    		l)
+	      			git ls-remote . refs/conflicts/*
+	      		;;
+	    		d)
+	      			git update-ref -d $OPTARG
+	    		;;
+			esac
+		done
+    ;;
+    *)
+		remote=$1
+		git show-ref -q "$remote" || die "Ref not found : $remote"
+
+		[ -f $conflictName ] && die "You are in the middle of a resolution"
+
+		[[ -n $(git diff-index HEAD) ]] && die "The repository has to be clean"
+
+	    echo $(git rev-parse $remote) > $mergeHead
+
+	    common=$(git merge-base --all $remote HEAD)
+
+	    git read-tree -u -m --aggressive $common HEAD $remote
+	    
+	    git-merge-index -o git-merge-one-file -a 2> /dev/null
+
+	    if test $? -eq 0 ; then
+			git reset -q --hard
+			echo "No conflict with $remote"
+			cleanup
+			exit 0
+		fi
+
+	    git hash-conflict > $conflictName
+	;;
+esac
