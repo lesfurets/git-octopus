@@ -23,7 +23,7 @@ cat-UU-conflict() {
 				rightContent+="$l$LF"
 			;;
 		esac
-	done < $1
+	done < "$(git rev-parse --show-cdup)$1"
 
 	conflictContent=
 	if ! $ordered && [ "$leftContent" \< "$rightContent" ] ; then
