@@ -47,7 +47,7 @@ while read status ; do
 	case $state in
 	    "UU")
 			# Clean conflict markers
-			sed -i "" -e "s/<<<<<<<.*/<<<<<<< /g" -e "s/>>>>>>>.*/>>>>>>> /g" $path
+			sed -i"" -e "s/<<<<<<<.*/<<<<<<< /g" -e "s/>>>>>>>.*/>>>>>>> /g" $path
 
 			# Store the current preimage
 			current_preimage=$(git unpack-file $(git hash-object -w $path))
