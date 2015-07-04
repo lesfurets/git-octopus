@@ -71,5 +71,5 @@ hash-conflict () {
 	    esac
 	done <<< "$(if [ -z "$file" ] ; then echo "$(git status --porcelain | grep "^U.\|^.U\|^AA\|^DD")" ; else echo "UU $file" ; fi)"
 
-	echo "$conflictContent" | shasum -p | cut -f 1 -d " "
+	echo "$conflictContent" | shasum | cut -f 1 -d " "
 }
