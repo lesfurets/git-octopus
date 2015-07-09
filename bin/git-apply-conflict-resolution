@@ -62,6 +62,7 @@ while read status ; do
 			recorded_preimage=$(git unpack-file $(git merge-file -L "" -L "" -L "" --stdout $leftFile $ancestorFile $rightFile | git hash-object --stdin -w))
 
 			if [ "$(hash-conflict -o -i $current_preimage)" != "$(hash-conflict -o -i $recorded_preimage)" ] ; then
+				rm $recorded_preimage
 				recorded_preimage=$(git unpack-file $(git merge-file -L "" -L "" -L "" --stdout $rightFile $ancestorFile $leftFile | git hash-object --stdin -w))
 			fi
 
