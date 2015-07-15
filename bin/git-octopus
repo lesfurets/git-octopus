@@ -49,7 +49,7 @@ while getopts "nh" opt; do
   esac
 done
 
-if [[ -n $(git diff-index HEAD) ]]
+if [[ -n "$(git diff-index HEAD)" ]]
 then
     echo "The repository has to be clean"
     exit 1
