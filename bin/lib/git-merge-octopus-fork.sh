@@ -89,7 +89,7 @@ do
 	if test $? -ne 0
 	then
 		echo "Simple merge did not work, trying automatic merge."
-		git-merge-index -o git-merge-one-file -a 2> /dev/null
+		git-merge-index -o git-merge-one-file -a
 
 		if test $? -ne 0
 		then
