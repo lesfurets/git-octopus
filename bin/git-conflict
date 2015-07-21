@@ -3,8 +3,7 @@
 usage() {
 cat <<EOF
 usage: git conflict <commit>
-   or: git conflict --commit
-   or: git conflict --abort
+   or: git conflict --continue | --abort
    or: git conflict -l
    or: git conflict -d <conflictRef>
 EOF
@@ -25,7 +24,7 @@ cleanup () {
 }
 
 case "$1" in
-    --commit)
+    --continue)
 		[ ! -f $conflictName ] && die "There is no resolution ongoing."
 
 		[ -z "$(git ls-files --unmerged)" ]  || die "All conflicts must be resolved"
