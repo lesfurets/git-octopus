@@ -39,11 +39,14 @@ leftParent=$(git rev-parse ${resolutionCommit}^1)
 rightParent=$(git rev-parse ${resolutionCommit}^2)
 commonAncestor=$(git merge-base $leftParent $rightParent)
 
+cdup="$(git rev-parse --show-cdup)"
+
 SUCCESS=true
 
 while read status ; do
 	state=$(echo $status | awk '{print $1;}')
 	path=$(echo $status | awk '{print $2;}')
+	path="$cdup$path"
 	case $state in
 	    "UU")
 			# Clean conflict markers
@@ -51,24 +54,24 @@ while read status ; do
 			perl -pi -e "s/>>>>>>>.*/>>>>>>> /g" $path
 
 			# Store the current preimage
-			current_preimage=$(git unpack-file $(git hash-object -w $path))
+			current_preimage="$cdup$(git unpack-file $(git hash-object -w $path))"
 
 			# Compute the preimage as it was when the resolution was recorded
-			leftFile=$(git unpack-file $(git ls-tree $leftParent $path | awk '{print $3;}'))
-			rightFile=$(git unpack-file $(git ls-tree $rightParent $path | awk '{print $3;}'))
-			ancestorFile=$(git unpack-file $(git ls-tree $commonAncestor $path | awk '{print $3;}'))
+			leftFile="$cdup$(git unpack-file $(git ls-tree $leftParent $path | awk '{print $3;}'))"
+			rightFile="$cdup$(git unpack-file $(git ls-tree $rightParent $path | awk '{print $3;}'))"
+			ancestorFile="$cdup$(git unpack-file $(git ls-tree $commonAncestor $path | awk '{print $3;}'))"
 			
 			# TODO mettre dans un tmp
-			recorded_preimage=$(git unpack-file $(git merge-file -L "" -L "" -L "" --stdout $leftFile $ancestorFile $rightFile | git hash-object --stdin -w))
+			recorded_preimage="$cdup$(git unpack-file $(git merge-file -L "" -L "" -L "" --stdout $leftFile $ancestorFile $rightFile | git hash-object --stdin -w))"
 
 			if [ "$(hash-conflict -o -i $current_preimage)" != "$(hash-conflict -o -i $recorded_preimage)" ] ; then
 				rm $recorded_preimage
-				recorded_preimage=$(git unpack-file $(git merge-file -L "" -L "" -L "" --stdout $rightFile $ancestorFile $leftFile | git hash-object --stdin -w))
+				recorded_preimage="$cdup$(git unpack-file $(git merge-file -L "" -L "" -L "" --stdout $rightFile $ancestorFile $leftFile | git hash-object --stdin -w))"
 			fi
 
 			# Do the final merge between the initial conflict, the current conflict and the resolution
 			# This is based on what is done in rerere.c
-			resolutonFile=$(git unpack-file $(git ls-tree $resolutionCommit $path | awk '{print $3;}'))
+			resolutonFile="$cdup$(git unpack-file $(git ls-tree $resolutionCommit $path | awk '{print $3;}'))"
 
 			git merge-file --stdout $current_preimage $recorded_preimage $resolutonFile > $path \
 				&& git update-index --add $path \

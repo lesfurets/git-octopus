@@ -23,7 +23,7 @@ cat-UU-conflict() {
 				rightContent+="$l$LF"
 			;;
 		esac
-	done < "$(git rev-parse --show-cdup)$1"
+	done < "$1"
 
 	conflictContent=
 	if ! $ordered && [ "$leftContent" \< "$rightContent" ] ; then
@@ -69,7 +69,7 @@ hash-conflict () {
 				conflictContent+="$(cat-UU-conflict $path)$LF"
 			;;
 	    esac
-	done <<< "$(if [ -z "$file" ] ; then echo "$(git status --porcelain | grep "^U.\|^.U\|^AA\|^DD")" ; else echo "UU $file" ; fi)"
+	done <<< "$(if [ -z "$file" ] ; then echo "$(git status --porcelain | grep "^U.\|^.U\|^AA\|^DD" | awk -v cdup="$(git rev-parse --show-cdup)" '{print $1" "cdup$2;}')" ; else echo "UU $file" ; fi)"
 
 	echo "$conflictContent" | shasum | cut -f 1 -d " "
 }
