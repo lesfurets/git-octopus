@@ -1,0 +1,7 @@
+#!/bin/bash
+LF='
+'
+die () {
+    echo >&2 "$*"
+    exit 1
+}

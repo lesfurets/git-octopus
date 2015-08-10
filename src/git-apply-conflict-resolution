@@ -1,6 +1,3 @@
-#!/bin/bash
-. $(dirname $0)/lib/hash-conflict
-
 #Resolve conflicts marked in the index. Files in conflict must have been merged already with git-merge-index
 usage() {
 cat <<EOF
@@ -8,14 +5,6 @@ usage: git apply-conflict-resolution
    or: git apply-conflict-resolution <commit>
 EOF
 exit
-}
-
-LF='
-'
-
-die () {
-    echo >&2 "$*"
-    exit 1
 }
 
 [ "$1" == "-h" ] && usage

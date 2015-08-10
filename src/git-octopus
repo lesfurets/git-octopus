@@ -1,5 +1,3 @@
-#!/bin/bash
-
 usage() {
 cat <<EOF
 usage: git octopus [options] [<pattern>...]
@@ -94,7 +92,7 @@ do
     octopusMessage+="$branch$LF"
 done
 
-$(dirname $0)/lib/git-merge-octopus-fork.sh "$mergeBases" -- HEAD $sha1s
+merge-octopus-fork "$mergeBases" -- HEAD $sha1s
 
 if [ $? -eq 0 ]
 then
@@ -132,7 +130,7 @@ else
 
             sha1=$(git rev-parse --verify "$branch")
 
-            tmpFile=$($(dirname $0)/lib/git-merge-octopus-fork.sh "$mergeBase" -- HEAD $sha1 2>&1)
+            tmpFile=$(merge-octopus-fork "$mergeBase" -- HEAD $sha1 2>&1)
 
             if [ $? -eq 0 ]
             then
