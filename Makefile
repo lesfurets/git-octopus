@@ -1,7 +1,9 @@
-PREFIX = /usr/local
-BINDIR = $(PREFIX)/bin
-MANDIR = $(PREFIX)/share/man
-HTMLDIR = `git --html-path`
+prefix = /usr/local
+bindir = $(prefix)/bin
+datarootdir = $(prefix)/share
+mandir = $(datarootdir)/man
+docdir = $(datarootdir)/doc/git-doc
+htmldir = $(docdir)
 
 CAT_SCRIPTS = @`cat $^ > bin/$@ && chmod +x bin/$@`
 
@@ -21,21 +23,21 @@ git-apply-conflict-resolution: src/lib/common src/lib/hash-conflict src/git-appl
 	${CAT_SCRIPTS}
 
 install-bin: build
-	@cp -f bin/git-octopus $(BINDIR) && echo 'Installing $(BINDIR)/git-octopus'
-	@cp -f bin/git-conflict $(BINDIR) && echo 'Installing $(BINDIR)/git-conflict'
-	@cp -f bin/git-apply-conflict-resolution $(BINDIR) && echo 'Installing $(BINDIR)/git-apply-conflict-resolution'
+	@cp -f bin/git-octopus $(bindir) && echo 'Installing $(bindir)/git-octopus'
+	@cp -f bin/git-conflict $(bindir) && echo 'Installing $(bindir)/git-conflict'
+	@cp -f bin/git-apply-conflict-resolution $(bindir) && echo 'Installing $(bindir)/git-apply-conflict-resolution'
 
 install-docs:
 	@echo 'Installing documentation'
-	@cp -f man/man1/git-octopus.1 $(MANDIR)/man1/git-octopus.1
-	@mkdir -p $(HTMLDIR)
-	@cp -f doc/git-octopus.html $(HTMLDIR)
+	@cp -f man/man1/git-octopus.1 $(mandir)/man1/git-octopus.1
+	@mkdir -p $(htmldir)
+	@cp -f doc/git-octopus.html $(htmldir)
 
 install: install-bin install-docs
 
 uninstall:
-	rm $(BINDIR)/git-octopus
-	rm $(BINDIR)/git-conflict
-	rm $(BINDIR)/git-apply-conflict-resolution
-	rm $(MANDIR)/man1/git-octopus.1
-	rm $(HTMLDIR)/git-octopus.html
+	rm $(bindir)/git-octopus
+	rm $(bindir)/git-conflict
+	rm $(bindir)/git-apply-conflict-resolution
+	rm $(mandir)/man1/git-octopus.1
+	rm $(htmldir)/git-octopus.html
