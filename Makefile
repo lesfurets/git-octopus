@@ -5,28 +5,25 @@ mandir = $(datarootdir)/man
 docdir = $(datarootdir)/doc/git-doc
 htmldir = $(docdir)
 
-CAT_SCRIPTS = @`cat $^ > bin/$@ && chmod +x bin/$@`
+cat_scripts = cat $(2) $(3) $(4) $(5) > bin/$(1) \
+	&& chmod +x bin/$(1)
 
-build: setup git-octopus git-conflict git-apply-conflict-resolution
+generate_docs = asciidoc --out-file=doc/$(1).html src/doc/$(1).1.txt \
+    && a2x -f manpage src/doc/$(1).1.txt --verbose --no-xmllint --destination-dir=doc
+
+install_docs = cp -f doc/$(1).1 $(mandir)/man1/$(1).1 \
+	&& cp -f doc/$(1).html $(htmldir)
+
+build:
+	@mkdir -p bin
+	$(call cat_scripts,git-octopus,src/lib/common,src/lib/git-merge-octopus-fork.sh,src/git-octopus)
+	$(call cat_scripts,git-conflict,src/lib/common,src/lib/hash-conflict,src/git-conflict)
+	$(call cat_scripts,git-apply-conflict-resolution,src/lib/common,src/lib/hash-conflict,src/git-apply-conflict-resolution)
 	@echo 'Build success'
 
-setup: 
-	@mkdir -p bin
-
-git-octopus: src/lib/common src/lib/git-merge-octopus-fork.sh src/git-octopus
-	${CAT_SCRIPTS}
-	
-git-conflict: src/lib/common src/lib/hash-conflict src/git-conflict
-	${CAT_SCRIPTS}
-
-git-apply-conflict-resolution: src/lib/common src/lib/hash-conflict src/git-apply-conflict-resolution 
-	${CAT_SCRIPTS}
-
 build-docs:
-	mkdir doc
-	asciidoc --out-file=doc/git-octopus.html src/doc/git-octopus.1.txt
-	a2x -f manpage src/doc/git-octopus.1.txt --verbose --no-xmllint --destination-dir=doc
-
+	mkdir -p doc
+	$(call generate_docs,git-octopus)
 
 install-bin: build
 	@cp -f bin/git-octopus $(bindir) && echo 'Installing $(bindir)/git-octopus'
@@ -35,9 +32,8 @@ install-bin: build
 
 install-docs:
 	@echo 'Installing documentation'
-	@cp -f doc/git-octopus.1 $(mandir)/man1/git-octopus.1
 	@mkdir -p $(htmldir)
-	@cp -f doc/git-octopus.html $(htmldir)
+	$(call install_docs,git-octopus)
 
 install: install-bin install-docs
 
