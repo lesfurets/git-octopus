@@ -22,6 +22,12 @@ git-conflict: src/lib/common src/lib/hash-conflict src/git-conflict
 git-apply-conflict-resolution: src/lib/common src/lib/hash-conflict src/git-apply-conflict-resolution 
 	${CAT_SCRIPTS}
 
+build-docs:
+	mkdir doc
+	asciidoc --out-file=doc/git-octopus.html src/doc/git-octopus.1.txt
+	a2x -f manpage src/doc/git-octopus.1.txt --verbose --no-xmllint --destination-dir=doc
+
+
 install-bin: build
 	@cp -f bin/git-octopus $(bindir) && echo 'Installing $(bindir)/git-octopus'
 	@cp -f bin/git-conflict $(bindir) && echo 'Installing $(bindir)/git-conflict'
@@ -29,7 +35,7 @@ install-bin: build
 
 install-docs:
 	@echo 'Installing documentation'
-	@cp -f man/man1/git-octopus.1 $(mandir)/man1/git-octopus.1
+	@cp -f doc/git-octopus.1 $(mandir)/man1/git-octopus.1
 	@mkdir -p $(htmldir)
 	@cp -f doc/git-octopus.html $(htmldir)
 
