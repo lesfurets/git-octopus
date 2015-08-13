@@ -33,8 +33,7 @@ case "$1" in
 		git reset -q --hard
     ;;
     --abort)
-		
-		git reset -q --hard
+		git reset --merge
 		cleanup
 		exit 0
     ;;
