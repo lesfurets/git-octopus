@@ -9,7 +9,7 @@ cat_scripts = cat $(2) $(3) $(4) $(5) > bin/$(1) \
 	&& chmod +x bin/$(1)
 
 generate_docs = asciidoc --out-file=doc/$(1).html src/doc/$(1).1.txt \
-    && a2x -f manpage src/doc/$(1).1.txt --verbose --no-xmllint --destination-dir=doc
+    && a2x -f manpage src/doc/$(1).1.txt --no-xmllint --destination-dir=doc
 
 install_docs = cp -f doc/$(1).1 $(mandir)/man1/$(1).1 \
 	&& cp -f doc/$(1).html $(htmldir)
@@ -24,6 +24,7 @@ build:
 build-docs:
 	mkdir -p doc
 	$(call generate_docs,git-octopus)
+	$(call generate_docs,git-conflict)
 
 install-bin: build
 	@cp -f bin/git-octopus $(bindir) && echo 'Installing $(bindir)/git-octopus'
@@ -34,6 +35,7 @@ install-docs:
 	@echo 'Installing documentation'
 	@mkdir -p $(htmldir)
 	$(call install_docs,git-octopus)
+	$(call install_docs,git-conflict)
 
 install: install-bin install-docs
 

@@ -3,7 +3,6 @@ cat <<EOF
 usage: git conflict <commit>
    or: git conflict --continue | --abort
    or: git conflict -l
-   or: git conflict -d <conflictRef>
 EOF
 exit
 }
@@ -27,7 +26,7 @@ case "$1" in
 		conflictRef="refs/conflicts/$(cat $conflictName)"
 		git update-ref "$conflictRef" "$commit" "" &> /dev/null || 
 			die "Resolution $conflictRef already exists. "\
-			"If you want to override it, delete it first :${LF}git conflict -d $conflictRef"
+			"If you want to override it, delete it first :${LF}git update-ref -d $conflictRef"
 		echo "Conflict resolution created: $conflictRef" 
 		cleanup
 		git reset -q --hard
@@ -38,14 +37,11 @@ case "$1" in
 		exit 0
     ;;
     -*)
-    	while getopts "ld:h" opt; do
+    	while getopts "lh" opt; do
 	  		case "$opt" in
 	    		l)
 	      			git ls-remote . refs/conflicts/*
 	      		;;
-	    		d)
-	      			git update-ref -d $OPTARG
-	    		;;
 	    		h)
 					usage
 				;;

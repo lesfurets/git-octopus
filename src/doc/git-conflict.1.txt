@@ -1,0 +1,82 @@
+git-conflict(1)
+==============
+
+NAME
+----
+git-conflict - record conflict resolution.
+
+SYNOPSIS
+--------
+[verse]
+'git conflict' <commit>
+'git conflict' --continue | --abort | -l
+
+DESCRIPTION
+-----------
+Incorporates changes from <commit> (since the time their histories diverged from the current branch) into the current branch. If no conflicts happened, resets the repository and exit. If there's a conflict, lets the index and the working tree as it is.
+
+Once you've resolved the conflict using 'git add', run 'git conflict --continue' to record the resolution. It will print a ref that points to the resolution and resets the repository back to HEAD. 
+
+So 'git conflict' doesn't write history in your current branch. 
+
+If you're satisfied with the resolution you can push it using a simple 'git push'.
+
+------------------------------------------------------------------------------------
+$ git conflict --continue
+Conflict resolution created: refs/conflicts/75dd2c142264373c96a3341b2f9fb57bec7a7b7d
+$ git push origin refs/conflicts/75dd2c142264373c96a3341b2f9fb57bec7a7b7d
+------------------------------------------------------------------------------------
+
+'git conflict --continue' fails if a resolution for the same conflict already exists. To override a resolution you will need to delete the ref with 'git update-ref -d <ref>' before recording the new one and possibly force the push.
+
+OPTIONS
+-------
+-l::
++
+List all resolutions
+
+--abort::
++
+Abort the current conflict resolution process, and try to reconstruct the pre-merge state.
++
+If there were uncommitted worktree changes present when the merge started, git conflict --abort will in some cases be unable to reconstruct these changes. It is therefore recommended to always commit or stash your changes before running git conflict.
+
+--continue::
++
+Record the index state as the resolution of the conflict and prints its ref. The index and the working tree are reset back to HEAD.
+
+INTERNALS
+---------
+The first thing to know is that a conflict ref, for instance `refs/conflicts/75dd2c142264373c96a3341b2f9fb57bec7a7b7d`, is a standard commit. You can inspect it with 'git show' or any logger tool. It has an author and dates etc...
+
+The sha1 in the ref is a hash of the content of the conflict that has been resolved. This allows resolutions to be found easily by other commands given a conflict state by simply hashing the conflict content and looking for a `refs/conflict/<sha1>` of the same name. A resolution is not related to a particular branch, it can be applied in any circumstances that produced the same conflict. This means that you can continue to commit on your branches, you can rebase them, rename them anyhow. As long as the same conflict is produced, the resolution can be retrieved.
+
+LIMITATIONS
+-----------
+Currently, when reapplying a resolution, it will only look at `both modified` files. So conflicts with renames, mod changes and deletions are not handled. In addition, If you changed something in a file that wasn't in conflict state, it won't be reapply neither.
+
+Managing conflicts with more than a single branch is subtle. Let's say I'm on a local branch `topic_mine` and I have two different conflicts with `topic_arya` and `topic_eddard`
+-------------------------
+	  A---B---C topic_mine
+	 /
+    D---E---F---G topic_eddard
+         \
+          H---I topic_arya
+-------------------------
+I can write two resolutions
+------------------------------------------------------------------------------------
+$ git conflict topic_arya
+...
+$ git conflict --continue
+Conflict resolution created: refs/conflicts/9a4b40f6ec56260618b820e19c8bd734fbfb744d
+$ git conflict topic_eddard
+...
+git conflict --continue
+Conflict resolution created: refs/conflicts/8b3d16d22d0138ddbe6a1cd1a4cb9abf516a4609
+------------------------------------------------------------------------------------
+If I run 'git octopus topic_*' on my current branch (`topic_mine`), it will starts by merging `topic_arya` (branches are sorted alphabeticaly), will find the first resolution and then apply changes from `topic_eddard`, find the 2nd resolution and end up with a success. Let's push !
+---------------------------------------------------------------------------------------------------------------------------------
+$ git push origin refs/conflicts/9a4b40f6ec56260618b820e19c8bd734fbfb744d refs/conflicts/8b3d16d22d0138ddbe6a1cd1a4cb9abf516a4609
+---------------------------------------------------------------------------------------------------------------------------------
+Then Arya fetches and runs 'git octopus topic_*' from her branch `topic_arya`. It will starts by merging `topic_eddard`, no conflict happens (assuming), then merges `topic_mine`. The actual conflict of that merge will combine both conflicts because the current state have changes from both `topic_arya` and `topic_eddard`. This means that this conflict has a new signature that doesn't have any resolution and the octopus will fail.
+In this case 'git octopus' is not associative.
