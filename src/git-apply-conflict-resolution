@@ -72,4 +72,4 @@ while read status ; do
     esac
 done <<< "$(git status --porcelain | grep "^U.\|^.U\|^AA\|^DD")"
 
-if ! $SUCCESS ; then die "Outdated conflict resolution $conflictName" ; fi
+if ! $SUCCESS ; then die "Conflict not resolved" ; fi
