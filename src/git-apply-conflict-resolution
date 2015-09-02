@@ -2,7 +2,7 @@
 usage() {
 cat <<EOF
 usage: git apply-conflict-resolution
-   or: git apply-conflict-resolution <commit>
+   or: git apply-conflict-resolution <conflictName>
 EOF
 exit
 }
@@ -12,7 +12,7 @@ exit
 conflictName=
 
 if [ "$1" ] ; then
-	git show-ref -q --verify "$1" || die "Ref not found: $1"
+	git show-ref -q --verify "refs/conflicts/$1" || die "Ref not found: refs/conflicts/$1"
 	conflictName=$1 
 else
 	#Reading from the index
