@@ -45,6 +45,9 @@ case "$1" in
 	    		h)
 					usage
 				;;
+				\?)
+					exit 1
+				;;
 			esac
 		done
     ;;

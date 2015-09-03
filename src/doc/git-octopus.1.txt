@@ -9,6 +9,7 @@ SYNOPSIS
 --------
 [verse]
 'git octopus' [-n] [<pattern>...]
+'git octopus' -v
 
 DESCRIPTION
 -----------
@@ -25,6 +26,10 @@ OPTIONS
 -n::
 +
 Leaves the repository back to HEAD.
+
+-v::
++
+Prints the version of `git-octopus`
 
 EXAMPLES
 --------

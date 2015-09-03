@@ -33,6 +33,7 @@ git-octopus \- extends \*(Aqgit merge\*(Aq with branch naming patterns\&.
 .sp
 .nf
 \fIgit octopus\fR [\-n] [<pattern>\&...]
+\fIgit octopus\fR \-v
 .fi
 .SH "DESCRIPTION"
 .sp
@@ -46,6 +47,12 @@ In case of a merge failure, iterates over all the refs, computing merges with ea
 \-n
 .RS 4
 Leaves the repository back to HEAD\&.
+.RE
+.PP
+\-v
+.RS 4
+Prints the version of
+git\-octopus
 .RE
 .SH "EXAMPLES"
 .sp
