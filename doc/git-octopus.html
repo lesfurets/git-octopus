@@ -739,21 +739,26 @@ asciidoc.install();
 <div class="sect1">
 <h2 id="_name">NAME</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>git-octopus - extends git-merge with branch naming patterns.</p></div>
+<div class="paragraph"><p>git-octopus - extends <em>git merge</em> with branch naming patterns.</p></div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>git octopus [-n] [&lt;pattern&gt;&#8230;]</p></div>
+<div class="verseblock">
+<pre class="content"><em>git octopus</em> [-n] [&lt;pattern&gt;&#8230;]</pre>
+<div class="attribution">
+</div></div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>&lt;pattern&gt; can be any usual refspec or a naming pattern.
-Patterns are resolved using git-ls-remote, the resulting refs are given to git-merge.</p></div>
-<div class="paragraph"><p>In case of a merge failure, iterates over all the refs, computing merges with each ref (from HEAD) one by one for diagnosic purpose.</p></div>
+Patterns are resolved using <em>git ls-remote</em>, the resulting refs are given to <em>git merge</em>.</p></div>
+<div class="paragraph"><p>In case of conflicts, tries to reuse conflict resolutions stored by <em>git conflict</em> in <code>refs/conflicts/*</code>. (See <a href="git-conflict.html">git-conflict(1)</a>).</p></div>
+<div class="paragraph"><p>In case of a merge failure, iterates over all the refs, computing merges with each ref (from HEAD) one by one for diagnosic purpose.
+Learn more about conflict management on the project&#8217;s <a href="https://github.com/lesfurets/git-octopus">homepage</a></p></div>
 </div>
 </div>
 <div class="sect1">
@@ -781,7 +786,7 @@ Merge check of the current branch with all feature branches and the master from 
 <div class="content">
 <pre><code>$ git octopus -n origin/features/* origin/master</code></pre>
 </div></div>
-<div class="paragraph"><p>This is basically a merge check command you would do before pushing your branch.</p></div>
+<div class="paragraph"><p>This is basically a merge check you would do before pushing your branch.</p></div>
 </li>
 </ul></div>
 </div>
@@ -800,7 +805,7 @@ octopus.commit
 octopus.pattern
 </dt>
 <dd>
-<div class="paragraph"><p>Defines a branch naming pattern. Use multiple lines to define several patterns. See git-config.</p></div>
+<div class="paragraph"><p>Defines a branch naming pattern that <em>git octopus</em> would use by default. Use multiple lines to define several patterns. See <a href="git-config.html">git-config(1)</a>.</p></div>
 </dd>
 </dl></div>
 </div>
@@ -808,14 +813,14 @@ octopus.pattern
 <div class="sect1">
 <h2 id="_see_also">SEE ALSO</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>git-merge, git-ls-remote</p></div>
+<div class="paragraph"><p><a href="git-merge.html">git-merge(1)</a>, <a href="git-ls-remote.html">git-ls-remote(1)</a>, <a href="git-conflict.html">git-conflict(1)</a></p></div>
 </div>
 </div>
 </div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-03-09 15:57:43 CET
+Last updated 2015-09-03 23:25:43 CEST
 </div>
 </div>
 </body>

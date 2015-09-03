@@ -2,12 +2,12 @@
 .\"     Title: git-octopus
 .\"    Author: [FIXME: author] [see http://docbook.sf.net/el/author]
 .\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
-.\"      Date: 08/12/2015
+.\"      Date: 09/03/2015
 .\"    Manual: \ \&
 .\"    Source: \ \&
 .\"  Language: English
 .\"
-.TH "GIT\-OCTOPUS" "1" "08/12/2015" "\ \&" "\ \&"
+.TH "GIT\-OCTOPUS" "1" "09/03/2015" "\ \&" "\ \&"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -28,15 +28,19 @@
 .\" * MAIN CONTENT STARTS HERE *
 .\" -----------------------------------------------------------------
 .SH "NAME"
-git-octopus \- extends git\-merge with branch naming patterns\&.
+git-octopus \- extends \*(Aqgit merge\*(Aq with branch naming patterns\&.
 .SH "SYNOPSIS"
 .sp
-git octopus [\-n] [<pattern>\&...]
+.nf
+\fIgit octopus\fR [\-n] [<pattern>\&...]
+.fi
 .SH "DESCRIPTION"
 .sp
-<pattern> can be any usual refspec or a naming pattern\&. Patterns are resolved using git\-ls\-remote, the resulting refs are given to git\-merge\&.
+<pattern> can be any usual refspec or a naming pattern\&. Patterns are resolved using \fIgit ls\-remote\fR, the resulting refs are given to \fIgit merge\fR\&.
 .sp
-In case of a merge failure, iterates over all the refs, computing merges with each ref (from HEAD) one by one for diagnosic purpose\&.
+In case of conflicts, tries to reuse conflict resolutions stored by \fIgit conflict\fR in refs/conflicts/*\&. (See git\-conflict(1))\&.
+.sp
+In case of a merge failure, iterates over all the refs, computing merges with each ref (from HEAD) one by one for diagnosic purpose\&. Learn more about conflict management on the project\(cqs homepage
 .SH "OPTIONS"
 .PP
 \-n
@@ -65,7 +69,7 @@ $ git octopus \-n origin/features/* origin/master
 .RE
 .\}
 .sp
-This is basically a merge check command you would do before pushing your branch\&.
+This is basically a merge check you would do before pushing your branch\&.
 .RE
 .SH "CONFIGURATION"
 .PP
@@ -76,8 +80,11 @@ true by default\&. set to false behaves like \-n
 .PP
 octopus\&.pattern
 .RS 4
-Defines a branch naming pattern\&. Use multiple lines to define several patterns\&. See git\-config\&.
+Defines a branch naming pattern that
+\fIgit octopus\fR
+would use by default\&. Use multiple lines to define several patterns\&. See
+git\-config(1)\&.
 .RE
 .SH "SEE ALSO"
 .sp
-git\-merge, git\-ls\-remote
+git\-merge(1), git\-ls\-remote(1), git\-conflict(1)

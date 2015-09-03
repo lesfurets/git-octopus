@@ -3,18 +3,22 @@ git-octopus(1)
 
 NAME
 ----
-git-octopus - extends git-merge with branch naming patterns.
+git-octopus - extends 'git merge' with branch naming patterns.
 
 SYNOPSIS
 --------
-git octopus [-n] [<pattern>...]
+[verse]
+'git octopus' [-n] [<pattern>...]
 
 DESCRIPTION
 -----------
 <pattern> can be any usual refspec or a naming pattern.
-Patterns are resolved using git-ls-remote, the resulting refs are given to git-merge.
+Patterns are resolved using 'git ls-remote', the resulting refs are given to 'git merge'.
+
+In case of conflicts, tries to reuse conflict resolutions stored by 'git conflict' in `refs/conflicts/*`. (See link:git-conflict.html[git-conflict(1)]).
 
 In case of a merge failure, iterates over all the refs, computing merges with each ref (from HEAD) one by one for diagnosic purpose.
+Learn more about conflict management on the project's https://github.com/lesfurets/git-octopus[homepage]
 
 OPTIONS
 -------
@@ -30,7 +34,7 @@ EXAMPLES
 $ git octopus -n origin/features/* origin/master
 ---------------------------------------------------
 +
-This is basically a merge check command you would do before pushing your branch.
+This is basically a merge check you would do before pushing your branch.
 
 CONFIGURATION
 -------------
@@ -40,9 +44,9 @@ true by default. set to false behaves like -n
 
 octopus.pattern::
 +
-Defines a branch naming pattern. Use multiple lines to define several patterns. See git-config.
+Defines a branch naming pattern that 'git octopus' would use by default. Use multiple lines to define several patterns. See link:git-config.html[git-config(1)].
 
 
 SEE ALSO
 --------
-git-merge, git-ls-remote
+link:git-merge.html[git-merge(1)], link:git-ls-remote.html[git-ls-remote(1)], link:git-conflict.html[git-conflict(1)]
