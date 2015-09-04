@@ -2,12 +2,12 @@
 .\"     Title: git-conflict
 .\"    Author: [FIXME: author] [see http://docbook.sf.net/el/author]
 .\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
-.\"      Date: 08/23/2015
-.\"    Manual: \ \&
-.\"    Source: \ \&
+.\"      Date: 09/05/2015
+.\"    Manual: git-octopus suit Manual
+.\"    Source: git-octopus 1.1
 .\"  Language: English
 .\"
-.TH "GIT\-CONFLICT" "1" "08/23/2015" "\ \&" "\ \&"
+.TH "GIT\-CONFLICT" "1" "09/05/2015" "git\-octopus 1\&.1" "git\-octopus suit Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -133,3 +133,6 @@ $ git push origin refs/conflicts/9a4b40f6ec56260618b820e19c8bd734fbfb744d refs/c
 .\}
 .sp
 Then Arya fetches and runs \fIgit octopus topic_*\fR from her branch topic_arya\&. It will starts by merging topic_eddard, no conflict happens (assuming), then merges topic_mine\&. The actual conflict of that merge will combine both conflicts because the current state have changes from both topic_arya and topic_eddard\&. This means that this conflict has a new signature that doesn\(cqt have any resolution and the octopus will fail\&. In this case \fIgit octopus\fR is not associative\&.
+.SH "GIT-OCTOPUS"
+.sp
+Part of the git\-octopus suit\&.

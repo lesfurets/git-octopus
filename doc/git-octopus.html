@@ -731,17 +731,19 @@ asciidoc.install();
 /*]]>*/
 </script>
 </head>
-<body class="article">
+<body class="manpage">
 <div id="header">
-<h1>git-octopus(1)</h1>
+<h1>
+git-octopus(1) Manual Page
+</h1>
+<h2>NAME</h2>
+<div class="sectionbody">
+<p>git-octopus -
+   extends git-merge with branch naming patterns.
+</p>
+</div>
 </div>
 <div id="content">
-<div class="sect1">
-<h2 id="_name">NAME</h2>
-<div class="sectionbody">
-<div class="paragraph"><p>git-octopus - extends <em>git merge</em> with branch naming patterns.</p></div>
-</div>
-</div>
 <div class="sect1">
 <h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
@@ -759,7 +761,7 @@ asciidoc.install();
 Patterns are resolved using <em>git ls-remote</em>, the resulting refs are given to <em>git merge</em>.</p></div>
 <div class="paragraph"><p>In case of conflicts, tries to reuse conflict resolutions stored by <em>git conflict</em> in <code>refs/conflicts/*</code>. (See <a href="git-conflict.html">git-conflict(1)</a>).</p></div>
 <div class="paragraph"><p>In case of a merge failure, iterates over all the refs, computing merges with each ref (from HEAD) one by one for diagnosic purpose.
-Learn more about conflict management on the project&#8217;s <a href="https://github.com/lesfurets/git-octopus">homepage</a></p></div>
+Learn more about conflict management on the project&#8217;s <a href="https://github.com/lesfurets/git-octopus">homepage</a>.</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -820,14 +822,20 @@ octopus.pattern
 <div class="sect1">
 <h2 id="_see_also">SEE ALSO</h2>
 <div class="sectionbody">
-<div class="paragraph"><p><a href="git-merge.html">git-merge(1)</a>, <a href="git-ls-remote.html">git-ls-remote(1)</a>, <a href="git-conflict.html">git-conflict(1)</a></p></div>
+<div class="paragraph"><p><a href="git-merge.html">git-merge(1)</a>, <a href="git-ls-remote.html">git-ls-remote(1)</a>, <a href="git-conflict.html">git-conflict(1)</a>.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_git_octopus">GIT-OCTOPUS</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Part of the <a href="https://github.com/lesfurets/git-octopus">git-octopus</a> suit.</p></div>
 </div>
 </div>
 </div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-09-03 23:30:38 CEST
+Last updated 2015-09-05 13:50:39 CEST
 </div>
 </div>
 </body>

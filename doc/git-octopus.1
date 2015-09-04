@@ -2,12 +2,12 @@
 .\"     Title: git-octopus
 .\"    Author: [FIXME: author] [see http://docbook.sf.net/el/author]
 .\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
-.\"      Date: 09/03/2015
-.\"    Manual: \ \&
-.\"    Source: \ \&
+.\"      Date: 09/05/2015
+.\"    Manual: git-octopus suit Manual
+.\"    Source: git-octopus 1.1
 .\"  Language: English
 .\"
-.TH "GIT\-OCTOPUS" "1" "09/03/2015" "\ \&" "\ \&"
+.TH "GIT\-OCTOPUS" "1" "09/05/2015" "git\-octopus 1\&.1" "git\-octopus suit Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -28,7 +28,7 @@
 .\" * MAIN CONTENT STARTS HERE *
 .\" -----------------------------------------------------------------
 .SH "NAME"
-git-octopus \- extends \*(Aqgit merge\*(Aq with branch naming patterns\&.
+git-octopus \- extends git\-merge with branch naming patterns\&.
 .SH "SYNOPSIS"
 .sp
 .nf
@@ -41,7 +41,7 @@ git-octopus \- extends \*(Aqgit merge\*(Aq with branch naming patterns\&.
 .sp
 In case of conflicts, tries to reuse conflict resolutions stored by \fIgit conflict\fR in refs/conflicts/*\&. (See git\-conflict(1))\&.
 .sp
-In case of a merge failure, iterates over all the refs, computing merges with each ref (from HEAD) one by one for diagnosic purpose\&. Learn more about conflict management on the project\(cqs homepage
+In case of a merge failure, iterates over all the refs, computing merges with each ref (from HEAD) one by one for diagnosic purpose\&. Learn more about conflict management on the project\(cqs homepage\&.
 .SH "OPTIONS"
 .PP
 \-n
@@ -94,4 +94,7 @@ git\-config(1)\&.
 .RE
 .SH "SEE ALSO"
 .sp
-git\-merge(1), git\-ls\-remote(1), git\-conflict(1)
+git\-merge(1), git\-ls\-remote(1), git\-conflict(1)\&.
+.SH "GIT-OCTOPUS"
+.sp
+Part of the git\-octopus suit\&.

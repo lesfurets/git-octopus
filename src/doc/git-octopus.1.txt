@@ -1,9 +1,13 @@
+:man manual:   git-octopus suit Manual
+:man source:   git-octopus
+:man version:  1.1
+
 git-octopus(1)
 ==============
 
 NAME
 ----
-git-octopus - extends 'git merge' with branch naming patterns.
+git-octopus - extends git-merge with branch naming patterns.
 
 SYNOPSIS
 --------
@@ -19,7 +23,7 @@ Patterns are resolved using 'git ls-remote', the resulting refs are given to 'gi
 In case of conflicts, tries to reuse conflict resolutions stored by 'git conflict' in `refs/conflicts/*`. (See link:git-conflict.html[git-conflict(1)]).
 
 In case of a merge failure, iterates over all the refs, computing merges with each ref (from HEAD) one by one for diagnosic purpose.
-Learn more about conflict management on the project's https://github.com/lesfurets/git-octopus[homepage]
+Learn more about conflict management on the project's https://github.com/lesfurets/git-octopus[homepage].
 
 OPTIONS
 -------
@@ -54,4 +58,8 @@ Defines a branch naming pattern that 'git octopus' would use by default. Use mul
 
 SEE ALSO
 --------
-link:git-merge.html[git-merge(1)], link:git-ls-remote.html[git-ls-remote(1)], link:git-conflict.html[git-conflict(1)]
+link:git-merge.html[git-merge(1)], link:git-ls-remote.html[git-ls-remote(1)], link:git-conflict.html[git-conflict(1)].
+
+GIT-OCTOPUS
+-----------
+Part of the https://github.com/lesfurets/git-octopus[git-octopus] suit.

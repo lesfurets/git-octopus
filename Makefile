@@ -8,7 +8,7 @@ htmldir = $(docdir)
 cat_scripts = cat $(2) $(3) $(4) $(5) > bin/$(1) \
 	&& chmod +x bin/$(1)
 
-generate_docs = asciidoc --out-file=doc/$(1).html src/doc/$(1).1.txt \
+generate_docs = asciidoc -d manpage --out-file=doc/$(1).html src/doc/$(1).1.txt \
     && a2x -f manpage src/doc/$(1).1.txt --no-xmllint --destination-dir=doc
 
 install_docs = cp -f doc/$(1).1 $(mandir)/man1/$(1).1 \

@@ -1,3 +1,7 @@
+:man manual:   git-octopus suit Manual
+:man source:   git-octopus
+:man version:  1.1
+
 git-conflict(1)
 ==============
 
@@ -80,3 +84,7 @@ $ git push origin refs/conflicts/9a4b40f6ec56260618b820e19c8bd734fbfb744d refs/c
 ---------------------------------------------------------------------------------------------------------------------------------
 Then Arya fetches and runs 'git octopus topic_*' from her branch `topic_arya`. It will starts by merging `topic_eddard`, no conflict happens (assuming), then merges `topic_mine`. The actual conflict of that merge will combine both conflicts because the current state have changes from both `topic_arya` and `topic_eddard`. This means that this conflict has a new signature that doesn't have any resolution and the octopus will fail.
 In this case 'git octopus' is not associative.
+
+GIT-OCTOPUS
+-----------
+Part of the https://github.com/lesfurets/git-octopus[git-octopus] suit.
