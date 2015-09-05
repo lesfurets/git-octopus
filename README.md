@@ -64,6 +64,8 @@ This job computes a merge with all feature branches and the master, and then pus
 The new merge commit on `octopus` will now trigger an other job that will build and deploy this merge on your test servers etc ...
 Note that the octopus merge is not kept in any history line. The next push on any feature branch will trigger the build of a new merge that will be forced push again on `octopus`.
 
+Once a feature branch is validated on your test environment, you can merge it on master.
+
 ### Managing conflicts
 If `git-octopus` fails, it will do a diagnostic sequence to figure out the conflict precisely. It can lead to two cases : 
 
