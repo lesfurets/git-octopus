@@ -16,12 +16,11 @@ Download the latest [release](https://github.com/lesfurets/git-octopus/releases/
 ```bash
 make install
 ```
-This will install the project in `/usr/local` by default. If you want to change that, you can specify the wanted prefix.
 
+Make sure the installation works
 ```bash
-make prefix='/usr' install
+git-octopus -v
 ```
-Then, binaries will be installed in `/usr/bin` and man pages in `/usr/share/man`.
 
 ## What you'll find
 Two additionnal git commands : 
