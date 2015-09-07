@@ -43,6 +43,8 @@ See the conflicts management section bellow and [git-conflict(1)](http://lesfure
 ### What is it all about ?
 Feature branching and continuous integration don't live well together. The idea of this project is to reconcile those two by using the mighty power of git.
 
+I gave a talk about why and how to use it at Devoxx France 2015, but it's in french ;) https://www.parleys.com/tutorial/le-continuous-merge-chez-lesfurets-com
+
 ###The branching model
 The simpliest form of the model is to have a mainline branch, let's call it `master`, and feature branches on top of that master. In a continuous delivery workflow you won't need more than that. 
 
