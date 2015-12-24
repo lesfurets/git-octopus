@@ -19,7 +19,7 @@ make install
 
 Make sure the installation works
 ```bash
-git-octopus -v
+git octopus -v
 ```
 
 ## What you'll find
