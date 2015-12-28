@@ -748,7 +748,7 @@ git-octopus(1) Manual Page
 <h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<pre class="content"><em>git octopus</em> [-n] [&lt;pattern&gt;&#8230;]
+<pre class="content"><em>git octopus</em> [-n|-c] [&lt;pattern&gt;&#8230;]
 <em>git octopus</em> -v</pre>
 <div class="attribution">
 </div></div>
@@ -773,6 +773,12 @@ Learn more about conflict management on the project&#8217;s <a href="https://git
 </dt>
 <dd>
 <div class="paragraph"><p>Leaves the repository back to HEAD.</p></div>
+</dd>
+<dt class="hdlist1">
+-c
+</dt>
+<dd>
+<div class="paragraph"><p>Commit the resulting merge in the current branch. This is the default behavior unless <code>-n</code> or <code>octopus.commit</code> set to false. Use this option to override the latter.</p></div>
 </dd>
 <dt class="hdlist1">
 -v
@@ -835,7 +841,7 @@ octopus.pattern
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-09-05 13:50:39 CEST
+Last updated 2015-12-28 22:09:26 CET
 </div>
 </div>
 </body>

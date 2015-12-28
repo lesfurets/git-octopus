@@ -1,6 +1,6 @@
 :man manual:   git-octopus suit Manual
 :man source:   git-octopus
-:man version:  1.1
+:man version:  1.1.1
 
 git-conflict(1)
 ==============

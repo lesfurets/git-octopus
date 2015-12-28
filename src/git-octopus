@@ -3,7 +3,7 @@ cat <<EOF
 usage: git octopus [options] [<pattern>...]
 
     -n     leaves the repository back to HEAD
-    -c     commit the octopus in repository (default)
+    -c     Commit the resulting merge in the current branch.
     -v     prints the version of git-octopus
 EOF
 exit
