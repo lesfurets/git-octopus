@@ -1,9 +1,10 @@
 usage() {
 cat <<EOF
-usage: git octopus [options] [<pattern>...]
+usage: git octopus [options] [-p <pattern>]
 
     -n     leaves the repository back to HEAD
     -v     prints the version of git-octopus
+    -p     select branches using specified pattern
 EOF
 exit
 }
@@ -28,14 +29,19 @@ resetRepository(){
 trap "resetRepository && exit 1;" SIGINT SIGQUIT
 
 doCommit=$(git config octopus.commit)
+#Retrive patterns written in the conf
+patterns=$(git config --get-all octopus.pattern)
 
-while getopts "nhv" opt; do
+while getopts "nhvp:" opt; do
   case "$opt" in
     h)
       usage
       ;;
     n)
       doCommit=false
+      ;;
+    p)
+      patterns=$OPTARG
       ;;
     v)
       echo "1.1.1"
@@ -51,17 +57,6 @@ if [[ -n "$(git diff-index HEAD)" ]]
 then
     echo "The repository has to be clean"
     exit 1
-fi
-
-#Shift all options in order to iterate over refspec-patterns
-shift $(expr $OPTIND - 1)
-
-#Retrive patterns written in the conf
-patterns=$(git config --get-all octopus.pattern)
-
-#Overriding the conf with the patterns given as parameters
-if [[ -n "$@" ]] ; then
-    patterns=$@
 fi
 
 #Exit code 0 if nothing to merge
