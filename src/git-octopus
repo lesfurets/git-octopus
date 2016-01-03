@@ -16,16 +16,16 @@ line_break(){
 triggeredBranch=$(git symbolic-ref --short HEAD 2> /dev/null) ||
     triggeredBranch=$(git rev-parse HEAD)
 
-resetRepository(){
+signalHandler(){
     echo
     line_break
     echo "Stoping..."
     echo "HEAD -> $triggeredBranch"
     git reset -q --hard
     git checkout -q $triggeredBranch
+    git clean -d -f
+    exit 1
 }
-
-trap "resetRepository && exit 1;" SIGINT SIGQUIT
 
 doCommit=$(git config octopus.commit)
 
@@ -47,11 +47,9 @@ while getopts "nhv" opt; do
   esac
 done
 
-if [[ -n "$(git diff-index HEAD)" ]]
-then
-    echo "The repository has to be clean"
-    exit 1
-fi
+[[ -z $(git status --porcelain) ]] || die "The repository has to be clean"
+
+trap signalHandler SIGINT SIGQUIT
 
 #Shift all options in order to iterate over refspec-patterns
 shift $(expr $OPTIND - 1)
