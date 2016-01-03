@@ -1,9 +1,10 @@
 usage() {
 cat <<EOF
-usage: git octopus [options] [<pattern>...]
+usage: git octopus [options] [-p <pattern>]
 
     -n     leaves the repository back to HEAD
     -v     prints the version of git-octopus
+    -p     select branches using specified pattern
 EOF
 exit
 }
@@ -28,14 +29,19 @@ signalHandler(){
 }
 
 doCommit=$(git config octopus.commit)
+#Retrive patterns written in the conf
+patterns=$(git config --get-all octopus.pattern)
 
-while getopts "nhv" opt; do
+while getopts "nhvp:" opt; do
   case "$opt" in
     h)
       usage
       ;;
     n)
       doCommit=false
+      ;;
+    p)
+      patterns=$OPTARG
       ;;
     v)
       echo "1.1.1"
@@ -50,17 +56,6 @@ done
 [[ -z $(git status --porcelain) ]] || die "The repository has to be clean"
 
 trap signalHandler SIGINT SIGQUIT
-
-#Shift all options in order to iterate over refspec-patterns
-shift $(expr $OPTIND - 1)
-
-#Retrive patterns written in the conf
-patterns=$(git config --get-all octopus.pattern)
-
-#Overriding the conf with the patterns given as parameters
-if [[ -n "$@" ]] ; then
-    patterns=$@
-fi
 
 #Exit code 0 if nothing to merge
 if [[ -z "$patterns" ]] ; then
