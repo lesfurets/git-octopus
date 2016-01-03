@@ -2,12 +2,12 @@
 .\"     Title: git-octopus
 .\"    Author: [FIXME: author] [see http://docbook.sf.net/el/author]
 .\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
-.\"      Date: 09/05/2015
+.\"      Date: 12/28/2015
 .\"    Manual: git-octopus suit Manual
-.\"    Source: git-octopus 1.1
+.\"    Source: git-octopus 1.1.1
 .\"  Language: English
 .\"
-.TH "GIT\-OCTOPUS" "1" "09/05/2015" "git\-octopus 1\&.1" "git\-octopus suit Manual"
+.TH "GIT\-OCTOPUS" "1" "12/28/2015" "git\-octopus 1\&.1\&.1" "git\-octopus suit Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -32,7 +32,7 @@ git-octopus \- extends git\-merge with branch naming patterns\&.
 .SH "SYNOPSIS"
 .sp
 .nf
-\fIgit octopus\fR [\-n] [<pattern>\&...]
+\fIgit octopus\fR [\-n|\-c] [<pattern>\&...]
 \fIgit octopus\fR \-v
 .fi
 .SH "DESCRIPTION"
@@ -47,6 +47,15 @@ In case of a merge failure, iterates over all the refs, computing merges with ea
 \-n
 .RS 4
 Leaves the repository back to HEAD\&.
+.RE
+.PP
+\-c
+.RS 4
+Commit the resulting merge in the current branch\&. This is the default behavior unless
+\-n
+or
+octopus\&.commit
+set to false\&. Use this option to override the latter\&.
 .RE
 .PP
 \-v

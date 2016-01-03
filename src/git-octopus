@@ -3,6 +3,7 @@ cat <<EOF
 usage: git octopus [options] [<pattern>...]
 
     -n     leaves the repository back to HEAD
+    -c     Commit the resulting merge in the current branch.
     -v     prints the version of git-octopus
 EOF
 exit
@@ -29,13 +30,16 @@ signalHandler(){
 
 doCommit=$(git config octopus.commit)
 
-while getopts "nhv" opt; do
+while getopts "nhvc" opt; do
   case "$opt" in
     h)
       usage
       ;;
     n)
       doCommit=false
+      ;;
+    c)
+      doCommit=true
       ;;
     v)
       echo "1.1.1"
