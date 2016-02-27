@@ -85,3 +85,7 @@ If `git-octopus` fails, it will do a diagnostic sequence to figure out the confl
 	1. Someone else might breaks the merge, look at previous octopus job executions.
 
 	2. You felt in a complex case. There are ongoing works to prevent that from happening but for the moment this might happen. Don't hesitate to open an issue !
+
+## Community
+
+We have a [Google Group](https://groups.google.com/forum/#!forum/git-octopus), feel free to come and discuss with us. You can also send an email to git-octopus@googlegroups.com.
