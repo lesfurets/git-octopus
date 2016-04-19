@@ -17,21 +17,33 @@ SYNOPSIS
 
 DESCRIPTION
 -----------
-Incorporates changes from <commit> (since the time their histories diverged from the current branch) into the current branch. If no conflicts happened, resets the repository and exit. If there's a conflict, lets the index and the working tree as it is.
 
-Once you've resolved the conflict using 'git add', run 'git conflict --continue' to record the resolution. It will print a ref that points to the resolution and resets the repository back to HEAD. 
+'git conflict' records a conflict resolution between two branches that 'git octopus' will be able to reuse.
 
-So 'git conflict' doesn't write history in your current branch. 
+Start the recording process between the current branch and an other branch with
 
-If you're satisfied with the resolution you can push it using a simple 'git push'.
+------------------------------------------------------------------------------------
+$ git conflict an_other_branch
+------------------------------------------------------------------------------------
+
+This will set the index and the working tree in the conflict state.
+Once you've resolved it using 'git add', run 'git conflict --continue' to record the resolution. 
+It will print a ref that points to the resolution and resets the repository back to HEAD. 
 
 ------------------------------------------------------------------------------------
 $ git conflict --continue
 Conflict resolution created: refs/conflicts/75dd2c142264373c96a3341b2f9fb57bec7a7b7d
-$ git push origin refs/conflicts/75dd2c142264373c96a3341b2f9fb57bec7a7b7d
 ------------------------------------------------------------------------------------
 
+So 'git conflict' doesn't write history in your current branch. 
+
 'git conflict --continue' fails if a resolution for the same conflict already exists. To override a resolution you will need to delete the ref with 'git update-ref -d <ref>' before recording the new one and possibly force the push.
+
+If you're satisfied with the resolution you can push it using a simple 'git push'.
+
+------------------------------------------------------------------------------------
+$ git push origin refs/conflicts/75dd2c142264373c96a3341b2f9fb57bec7a7b7d
+------------------------------------------------------------------------------------
 
 OPTIONS
 -------

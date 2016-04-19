@@ -757,17 +757,27 @@ git-conflict(1) Manual Page
 <div class="sect1">
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>Incorporates changes from &lt;commit&gt; (since the time their histories diverged from the current branch) into the current branch. If no conflicts happened, resets the repository and exit. If there&#8217;s a conflict, lets the index and the working tree as it is.</p></div>
-<div class="paragraph"><p>Once you&#8217;ve resolved the conflict using <em>git add</em>, run <em>git conflict --continue</em> to record the resolution. It will print a ref that points to the resolution and resets the repository back to HEAD.</p></div>
-<div class="paragraph"><p>So <em>git conflict</em> doesn&#8217;t write history in your current branch.</p></div>
-<div class="paragraph"><p>If you&#8217;re satisfied with the resolution you can push it using a simple <em>git push</em>.</p></div>
+<div class="paragraph"><p><em>git conflict</em> records a conflict resolution between two branches that <em>git octopus</em> will be able to reuse.</p></div>
+<div class="paragraph"><p>Start the recording process between the current branch and an other branch with</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>$ git conflict an_other_branch</code></pre>
+</div></div>
+<div class="paragraph"><p>This will set the index and the working tree in the conflict state.
+Once you&#8217;ve resolved it using <em>git add</em>, run <em>git conflict --continue</em> to record the resolution.
+It will print a ref that points to the resolution and resets the repository back to HEAD.</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><code>$ git conflict --continue
-Conflict resolution created: refs/conflicts/75dd2c142264373c96a3341b2f9fb57bec7a7b7d
-$ git push origin refs/conflicts/75dd2c142264373c96a3341b2f9fb57bec7a7b7d</code></pre>
+Conflict resolution created: refs/conflicts/75dd2c142264373c96a3341b2f9fb57bec7a7b7d</code></pre>
 </div></div>
+<div class="paragraph"><p>So <em>git conflict</em> doesn&#8217;t write history in your current branch.</p></div>
 <div class="paragraph"><p><em>git conflict --continue</em> fails if a resolution for the same conflict already exists. To override a resolution you will need to delete the ref with <em>git update-ref -d &lt;ref&gt;</em> before recording the new one and possibly force the push.</p></div>
+<div class="paragraph"><p>If you&#8217;re satisfied with the resolution you can push it using a simple <em>git push</em>.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>$ git push origin refs/conflicts/75dd2c142264373c96a3341b2f9fb57bec7a7b7d</code></pre>
+</div></div>
 </div>
 </div>
 <div class="sect1">
@@ -847,7 +857,7 @@ In this case <em>git octopus</em> is not associative.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-02-16 23:10:14 CET
+Last updated 2016-04-19 17:19:00 CEST
 </div>
 </div>
 </body>

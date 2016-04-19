@@ -1,13 +1,13 @@
 '\" t
 .\"     Title: git-conflict
 .\"    Author: [FIXME: author] [see http://docbook.sf.net/el/author]
-.\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
-.\"      Date: 02/16/2016
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: 04/19/2016
 .\"    Manual: git-octopus suit Manual
 .\"    Source: git-octopus 1.2
 .\"  Language: English
 .\"
-.TH "GIT\-CONFLICT" "1" "02/16/2016" "git\-octopus 1\&.2" "git\-octopus suit Manual"
+.TH "GIT\-CONFLICT" "1" "04/19/2016" "git\-octopus 1\&.2" "git\-octopus suit Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -37,13 +37,21 @@ git-conflict \- record conflict resolution\&.
 .fi
 .SH "DESCRIPTION"
 .sp
-Incorporates changes from <commit> (since the time their histories diverged from the current branch) into the current branch\&. If no conflicts happened, resets the repository and exit\&. If there\(cqs a conflict, lets the index and the working tree as it is\&.
+\fIgit conflict\fR records a conflict resolution between two branches that \fIgit octopus\fR will be able to reuse\&.
 .sp
-Once you\(cqve resolved the conflict using \fIgit add\fR, run \fIgit conflict \-\-continue\fR to record the resolution\&. It will print a ref that points to the resolution and resets the repository back to HEAD\&.
+Start the recording process between the current branch and an other branch with
 .sp
-So \fIgit conflict\fR doesn\(cqt write history in your current branch\&.
+.if n \{\
+.RS 4
+.\}
+.nf
+$ git conflict an_other_branch
+.fi
+.if n \{\
+.RE
+.\}
 .sp
-If you\(cqre satisfied with the resolution you can push it using a simple \fIgit push\fR\&.
+This will set the index and the working tree in the conflict state\&. Once you\(cqve resolved it using \fIgit add\fR, run \fIgit conflict \-\-continue\fR to record the resolution\&. It will print a ref that points to the resolution and resets the repository back to HEAD\&.
 .sp
 .if n \{\
 .RS 4
@@ -51,13 +59,26 @@ If you\(cqre satisfied with the resolution you can push it using a simple \fIgit
 .nf
 $ git conflict \-\-continue
 Conflict resolution created: refs/conflicts/75dd2c142264373c96a3341b2f9fb57bec7a7b7d
-$ git push origin refs/conflicts/75dd2c142264373c96a3341b2f9fb57bec7a7b7d
 .fi
 .if n \{\
 .RE
 .\}
 .sp
+So \fIgit conflict\fR doesn\(cqt write history in your current branch\&.
+.sp
 \fIgit conflict \-\-continue\fR fails if a resolution for the same conflict already exists\&. To override a resolution you will need to delete the ref with \fIgit update\-ref \-d <ref>\fR before recording the new one and possibly force the push\&.
+.sp
+If you\(cqre satisfied with the resolution you can push it using a simple \fIgit push\fR\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+$ git push origin refs/conflicts/75dd2c142264373c96a3341b2f9fb57bec7a7b7d
+.fi
+.if n \{\
+.RE
+.\}
 .SH "OPTIONS"
 .PP
 \-l
@@ -133,6 +154,6 @@ $ git push origin refs/conflicts/9a4b40f6ec56260618b820e19c8bd734fbfb744d refs/c
 .\}
 .sp
 Then Arya fetches and runs \fIgit octopus topic_*\fR from her branch topic_arya\&. It will starts by merging topic_eddard, no conflict happens (assuming), then merges topic_mine\&. The actual conflict of that merge will combine both conflicts because the current state have changes from both topic_arya and topic_eddard\&. This means that this conflict has a new signature that doesn\(cqt have any resolution and the octopus will fail\&. In this case \fIgit octopus\fR is not associative\&.
-.SH "GIT-OCTOPUS"
+.SH "GIT\-OCTOPUS"
 .sp
 Part of the git\-octopus suit\&.
