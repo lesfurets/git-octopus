@@ -42,7 +42,7 @@ while getopts "nhvc" opt; do
       doCommit=true
       ;;
     v)
-      echo "1.2"
+      echo "1.2.1"
       exit 0
       ;;
     \?)
