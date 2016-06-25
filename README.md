@@ -89,3 +89,5 @@ If `git-octopus` fails, it will do a diagnostic sequence to figure out the confl
 ## Community
 
 We have a [Google Group](https://groups.google.com/forum/#!forum/git-octopus), feel free to come and discuss with us. You can also send an email to git-octopus@googlegroups.com.
+
+[![Analytics](https://ga-beacon.appspot.com/UA-79856083-1/README.md?pixel&useReferrer)](https://github.com/igrigorik/ga-beacon)
