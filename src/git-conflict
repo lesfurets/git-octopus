@@ -22,7 +22,7 @@ case "$1" in
 		[ -z "$(git ls-files --unmerged)" ]  || die "All conflicts must be resolved"
 		# if all conflicts are resolved ...
 		tree=$(git write-tree)
-		commit=$(git commit-tree $tree -m "resolution between $(git symbolic-ref HEAD) and $(cat $mergeHead)" -p HEAD -p $(cat $mergeHead))
+		commit=$(git commit-tree $tree -m "resolution between $(git symbolic-ref -q HEAD || git rev-parse HEAD) and $(cat $mergeHead)" -p HEAD -p $(cat $mergeHead))
 		conflictRef="refs/conflicts/$(cat $conflictName)"
 		git update-ref "$conflictRef" "$commit" "" &> /dev/null || 
 			die "Resolution $conflictRef already exists. "\
