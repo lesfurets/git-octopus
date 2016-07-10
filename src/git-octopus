@@ -4,6 +4,7 @@ usage: git octopus [options] [<pattern>...]
 
     -n     leaves the repository back to HEAD
     -c     Commit the resulting merge in the current branch.
+    -s <n> do the octopus by chunk of n branches (helps to keep the log graph clean when lots of remotes are merged).
     -v     prints the version of git-octopus
 EOF
 exit
@@ -16,21 +17,24 @@ line_break(){
 # Save the current state of the repository in $triggeredBranch
 triggeredBranch=$(git symbolic-ref --short HEAD 2> /dev/null) ||
     triggeredBranch=$(git rev-parse HEAD)
+# We save the current HEAD in case of an octopus by chunk
+triggeredSha1=$(git rev-parse --verify HEAD)
+
 
 signalHandler(){
     echo
     line_break
     echo "Stoping..."
     echo "HEAD -> $triggeredBranch"
-    git reset -q --hard
+    git reset -q --hard $triggeredSha1
     git checkout -q $triggeredBranch
     git clean -d -f
     exit 1
 }
 
 doCommit=$(git config octopus.commit)
-
-while getopts "nhvc" opt; do
+splitByChunk=false
+while getopts "nhvcs:" opt; do
   case "$opt" in
     h)
       usage
@@ -44,6 +48,11 @@ while getopts "nhvc" opt; do
     v)
       echo "1.2.1"
       exit 0
+      ;;
+    s)
+      [[ $OPTARG =~ ^-?[0-9]+$ ]] || die "-s argument must be a postive number"
+      splitByChunk=true
+      chunkSize=$OPTARG
       ;;
     \?)
       exit 1
@@ -73,6 +82,7 @@ fi
 
 branches=$(git ls-remote . $patterns | cut -d $'\t' -f 2)
 
+[ $branches -n ] && die "No branch matching $patterns were found"
 echo "Branches beeing merged :"
 for branch in $branches ; do
     echo $'\t'$branch
@@ -80,39 +90,61 @@ done
 
 line_break
 
-mergeBases= sha1s= octopusMessage=
+mergeBases= sha1s= octopusMessage= i=0
 for branch in $branches
 do
     sha1=$(git rev-parse --verify "$branch")
-    sha1s="$sha1s $sha1"
+    sha1s[$i]="$sha1"
     eval GITHEAD_$sha1='"$branch"'
     export GITHEAD_$sha1
 
     # merges bases are not used in the octopus stategy so we don't need to compute them
     # mergeBases="$mergeBases`git merge-base --all HEAD $branch` "
 
-    octopusMessage+="$branch$LF"
+    octopusMessage[$i]="$branch"
+    ((i++))
+done
+$splitByChunk || chunkSize=${#sha1s[@]}
+
+$splitByChunk && echo "Will merge ${#sha1s[@]} branches by chunks of $chunkSize"
+for ((i=0; $i < ${#sha1s[@]}; i+=$chunkSize))
+do
+    if $splitByChunk; then
+      upperChunk=$(($i + $chunkSize))
+      [ $upperChunk -gt ${#sha1s[@]} ] && upperChunk=${#sha1s[@]}
+      echo "Merging chunks $i to $upperChunk (out of ${#sha1s[@]})"
+    fi
+    sha1sChunk=" ${sha1s[@]:$i:$chunkSize}"
+    merge-octopus-fork "$mergeBases" -- HEAD $sha1sChunk
+    octopusStatus=$?
+    if [ $octopusStatus -eq 0 ]
+    then
+        if [[ $doCommit || $splitByChunk ]]; then
+          tree=$(git write-tree)
+          head=$(git rev-parse --verify HEAD)
+          octopusMessageChunk="${octopusMessage[@]:$i:$chunkSize} "
+          commit=$(git commit-tree -p $head ${sha1sChunk// / -p } -m "${octopusMessageChunk// /$LF}" $tree)
+          git update-ref HEAD $commit
+          $splitByChunk && echo "Chunk success"
+        fi
+    else
+        $splitByChunk && echo "Chunk failed"
+        break
+    fi
 done
 
-merge-octopus-fork "$mergeBases" -- HEAD $sha1s
-
-if [ $? -eq 0 ]
+if [ $octopusStatus -eq 0 ]
 then
-    if $doCommit ; then
-        tree=$(git write-tree)
-        head=$(git rev-parse --verify HEAD)
-        commit=$(git commit-tree -p $head ${sha1s// / -p } -m "$octopusMessage" $tree)
-        git update-ref HEAD $commit
-    else
-        git reset -q --hard
+    if ! $doCommit; then
+      git reset -q --hard $triggeredSha1
     fi
     line_break
     echo "OCTOPUS SUCCESS"
 else
     # Octopus merge failed, starting to run the analysis sequence ...
     line_break
-   
-    git reset -q --hard HEAD
+
+    git reset -q --hard $triggeredSha1
 
     echo "Testing merges one by one with $triggeredBranch..."
     echo
