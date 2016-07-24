@@ -82,7 +82,11 @@ fi
 
 branches=$(git ls-remote . $patterns | cut -d $'\t' -f 2)
 
-[ $branches -n ] && die "No branch matching $patterns were found"
+if [ -z "$branches" ]; then
+  echo "No branch matching $patterns were found"
+  exit 0
+fi
+
 echo "Branches beeing merged :"
 for branch in $branches ; do
     echo $'\t'$branch
