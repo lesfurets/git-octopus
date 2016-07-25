@@ -3,10 +3,10 @@ cat-UU-conflict() {
 	rightContent=
 	reading="base"
 
-	while read l ; do 
-		echo $l | grep '^<<<<<<<' 1> /dev/null && reading="left" && continue
-		echo $l | grep '^=======' 1> /dev/null && reading="right" && continue
-		echo $l | grep '^>>>>>>>' 1> /dev/null && reading="base" && continue
+	while read l ; do
+		[[ $l == \<\<\<\<\<\<\<* ]] && reading="left" && continue
+		[[ $l == \=\=\=\=\=\=\=* ]] && reading="right" && continue
+		[[ $l == \>\>\>\>\>\>\>* ]] && reading="base" && continue
 
 		case $reading in
 			"base")
