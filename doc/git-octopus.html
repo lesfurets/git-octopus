@@ -748,7 +748,7 @@ git-octopus(1) Manual Page
 <h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<pre class="content"><em>git octopus</em> [-n|-c] [&lt;pattern&gt;&#8230;]
+<pre class="content"><em>git octopus</em> [-n|-c] [-s &lt;n&gt;] [&lt;pattern&gt;&#8230;]
 <em>git octopus</em> -v</pre>
 <div class="attribution">
 </div></div>
@@ -779,6 +779,12 @@ Learn more about conflict management on the project&#8217;s <a href="https://git
 </dt>
 <dd>
 <div class="paragraph"><p>Commit the resulting merge in the current branch. This is the default behavior unless <code>-n</code> or <code>octopus.commit</code> set to false. Use this option to override the latter.</p></div>
+</dd>
+<dt class="hdlist1">
+-s &lt;n&gt;
+</dt>
+<dd>
+<div class="paragraph"><p>Chunk mode: the merge is performed by subsets of &lt;n&gt; branches. This is meant to help reading the log graph when lots of branches are merged.</p></div>
 </dd>
 <dt class="hdlist1">
 -v
@@ -841,7 +847,7 @@ octopus.pattern
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-05-08 13:39:54 CEST
+Last updated 2016-07-27 15:49:15 CEST
 </div>
 </div>
 </body>
