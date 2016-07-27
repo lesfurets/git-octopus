@@ -12,7 +12,7 @@ git-octopus - extends git-merge with branch naming patterns.
 SYNOPSIS
 --------
 [verse]
-'git octopus' [-n|-c] [<pattern>...]
+'git octopus' [-n|-c] [-s <n>] [<pattern>...]
 'git octopus' -v
 
 DESCRIPTION
@@ -34,6 +34,10 @@ Leaves the repository back to HEAD.
 -c::
 +
 Commit the resulting merge in the current branch. This is the default behavior unless `-n` or `octopus.commit` set to false. Use this option to override the latter.
+
+-s <n>::
++
+Chunk mode: the merge is performed by subsets of <n> branches. This is meant to help reading the log graph when lots of branches are merged.
 
 -v::
 +
