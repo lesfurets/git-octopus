@@ -4,7 +4,7 @@ usage: git octopus [options] [<pattern>...]
 
     -n     leaves the repository back to HEAD
     -c     Commit the resulting merge in the current branch.
-    -s <n> do the octopus by chunk of n branches (helps to keep the log graph clean when lots of remotes are merged).
+    -s <n> do the octopus by chunk of n branches.
     -v     prints the version of git-octopus
 EOF
 exit
