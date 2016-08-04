@@ -2,7 +2,10 @@
 >git-octopus is a set of git commands that is meant to manage feature branching in a continuous integration/delivery workflow.
 
 ##Installation
-The only requirement is to have a command `shasum` in the path. This is the case on most unix based systems. If you're on Windows/Cygwin you may have to install it.
+
+###Requirements
+Requires git >= 1.8
+You need to have a command `shasum` in the path. This is the case on most unix based systems. If you're on Windows/Cygwin you may have to install it.
 
 ###Homebrew
 If you know and use [Homebrew](http://brew.sh), you just need to do:
