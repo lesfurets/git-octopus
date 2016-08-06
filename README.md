@@ -1,5 +1,5 @@
 #git-octopus
->git-octopus is a set of git commands that is meant to manage feature branching in a continuous integration/delivery workflow.
+>The continuous merge workflow is meant for continuous integration/delivery and is based on feature branching. git-octopus provides git commands to implement it.
 
 ##Installation
 The only requirement is to have a command `shasum` in the path. This is the case on most unix based systems. If you're on Windows/Cygwin you may have to install it.
@@ -38,7 +38,7 @@ Allows you to record conflicts resolutions that `git octopus` can reuse.
 Conflicts resolutions are standard refs so they can be pushed/fetched.
 See the conflicts management section bellow and [git-conflict(1)](http://lesfurets.github.io/git-octopus/doc/git-conflict.html).
 
-##Context
+##The Continuous Merge
 
 ### What is it all about ?
 Feature branching and continuous integration don't live well together. The idea of this project is to reconcile those two by using the mighty power of git.
