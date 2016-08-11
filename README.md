@@ -2,7 +2,10 @@
 >The continuous merge workflow is meant for continuous integration/delivery and is based on feature branching. git-octopus provides git commands to implement it.
 
 ##Installation
-The only requirement is to have a command `shasum` in the path. This is the case on most unix based systems. If you're on Windows/Cygwin you may have to install it.
+
+###Requirements
+Requires git >= 1.8
+You need to have a command `shasum` in the path. This is the case on most unix based systems. If you're on Windows/Cygwin you may have to install it.
 
 ###Homebrew
 If you know and use [Homebrew](http://brew.sh), you just need to do:

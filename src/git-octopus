@@ -119,6 +119,17 @@ do
       echo "Merging chunks $i to $upperChunk (out of ${#sha1s[@]})"
     fi
     sha1sChunk=" ${sha1s[@]:$i:$chunkSize}"
+
+    alreadyUpToDate=true
+    for sha1 in "${sha1sChunk[@]}"
+    do
+      git merge-base --is-ancestor $sha1 HEAD || alreadyUpToDate=false
+    done
+
+    # This prevents git-octopus to create a commit when there's nothing to merge,
+    # i.e. no feature branches but only master.
+    $alreadyUpToDate && octopusStatus=0 && echo "Already up to date" && continue
+
     merge-octopus-fork "$mergeBases" -- HEAD $sha1sChunk
     octopusStatus=$?
     if [ $octopusStatus -eq 0 ]
