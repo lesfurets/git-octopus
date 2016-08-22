@@ -121,7 +121,7 @@ do
     sha1sChunk=" ${sha1s[@]:$i:$chunkSize}"
 
     alreadyUpToDate=true
-    for sha1 in "${sha1sChunk[@]}"
+    for sha1 in ${sha1sChunk[@]}
     do
       git merge-base --is-ancestor $sha1 HEAD || alreadyUpToDate=false
     done
