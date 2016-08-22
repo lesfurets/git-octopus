@@ -12,7 +12,7 @@ git-octopus - extends git-merge with branch naming patterns.
 SYNOPSIS
 --------
 [verse]
-'git octopus' [-n|-c] [-s <n>] [<pattern>...]
+'git octopus' [-n|-c] [-s <n>] [-e <pattern>] [<pattern>...]
 'git octopus' -v
 
 DESCRIPTION
@@ -39,6 +39,10 @@ Commit the resulting merge in the current branch. This is the default behavior u
 +
 Chunk mode: the merge is performed by subsets of <n> branches. This is meant to help reading the log graph when lots of branches are merged.
 
+-e <pattern>::
++
+Exclude pattern: the merge excludes branches matching the <pattern>.
+
 -v::
 +
 Prints the version of `git-octopus`
@@ -63,6 +67,9 @@ octopus.pattern::
 +
 Defines a branch naming pattern that 'git octopus' would use by default. Use multiple lines to define several patterns. See link:git-config.html[git-config(1)].
 
+octopus.excludePattern::
++
+Defines a branch naming pattern that 'git octopus' will exclude by default.
 
 SEE ALSO
 --------

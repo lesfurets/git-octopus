@@ -5,12 +5,22 @@ usage: git octopus [options] [<pattern>...]
     -n     leaves the repository back to HEAD
     -c     Commit the resulting merge in the current branch.
     -s <n> do the octopus by chunk of n branches.
+    -e <p> exclude branches matching the pattern.
     -v     prints the version of git-octopus
 EOF
 exit
 }
 
-line_break(){
+removeAllFrom() {
+    from=$1
+    remove=$2
+    for i in $remove; do
+        from=${from/$i/}
+    done
+    echo "$from"
+}
+
+line_break() {
     echo "-----------------------------------------------------------"
 }
 
@@ -21,7 +31,7 @@ triggeredBranch=$(git symbolic-ref --short HEAD 2> /dev/null) ||
 triggeredSha1=$(git rev-parse --verify HEAD)
 
 
-signalHandler(){
+signalHandler() {
     echo
     line_break
     echo "Stoping..."
@@ -34,7 +44,7 @@ signalHandler(){
 
 doCommit=$(git config octopus.commit)
 splitByChunk=false
-while getopts "nhvcs:" opt; do
+while getopts "nhvcs:e:" opt; do
   case "$opt" in
     h)
       usage
@@ -54,6 +64,9 @@ while getopts "nhvcs:" opt; do
       splitByChunk=true
       chunkSize=$OPTARG
       ;;
+    e)
+      exclude+=" $OPTARG"
+      ;;
     \?)
       exit 1
       ;;
@@ -69,10 +82,14 @@ shift $(expr $OPTIND - 1)
 
 #Retrive patterns written in the conf
 patterns=$(git config --get-all octopus.pattern)
+excludePatterns=$(git config --get-all octopus.excludePattern)
 
 #Overriding the conf with the patterns given as parameters
 if [[ -n "$@" ]] ; then
     patterns=$@
+fi
+if [[ -n "$exclude" ]]; then
+    excludePatterns=${exclude:1}
 fi
 
 #Exit code 0 if nothing to merge
@@ -81,6 +98,14 @@ if [[ -z "$patterns" ]] ; then
 fi
 
 branches=$(git ls-remote . $patterns | cut -d $'\t' -f 2)
+#Get nothing if excludePatterns is empty
+[[ -n "$excludePatterns" ]] && excludedBranches=$(git ls-remote . $excludePatterns | cut -d $'\t' -f 2)
+branches=$(removeAllFrom "$branches" "$excludedBranches")
+
+[[ -z "$excludedBranches" ]] || echo "Excluding branches :"
+for branch in $excludedBranches ; do
+    echo $'\t'$branch
+done
 
 if [ -z "$branches" ]; then
   echo "No branch matching $patterns were found"
