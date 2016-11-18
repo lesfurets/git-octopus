@@ -748,7 +748,7 @@ git-octopus(1) Manual Page
 <h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<pre class="content"><em>git octopus</em> [-n|-c] [-s &lt;n&gt;] [&lt;pattern&gt;&#8230;]
+<pre class="content"><em>git octopus</em> [-n|-c] [-s &lt;n&gt;] [-e &lt;pattern&gt;] [&lt;pattern&gt;&#8230;]
 <em>git octopus</em> -v</pre>
 <div class="attribution">
 </div></div>
@@ -785,6 +785,12 @@ Learn more about conflict management on the project&#8217;s <a href="https://git
 </dt>
 <dd>
 <div class="paragraph"><p>Chunk mode: the merge is performed by subsets of &lt;n&gt; branches. This is meant to help reading the log graph when lots of branches are merged.</p></div>
+</dd>
+<dt class="hdlist1">
+-e &lt;pattern&gt;
+</dt>
+<dd>
+<div class="paragraph"><p>Exclude pattern: the merge excludes branches matching the &lt;pattern&gt;.</p></div>
 </dd>
 <dt class="hdlist1">
 -v
@@ -828,6 +834,12 @@ octopus.pattern
 <dd>
 <div class="paragraph"><p>Defines a branch naming pattern that <em>git octopus</em> would use by default. Use multiple lines to define several patterns. See <a href="git-config.html">git-config(1)</a>.</p></div>
 </dd>
+<dt class="hdlist1">
+octopus.excludePattern
+</dt>
+<dd>
+<div class="paragraph"><p>Defines a branch naming pattern that <em>git octopus</em> will exclude by default.</p></div>
+</dd>
 </dl></div>
 </div>
 </div>
@@ -847,7 +859,7 @@ octopus.pattern
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-07-27 15:49:15 CEST
+Last updated 2016-11-18 15:17:57 CET
 </div>
 </div>
 </body>

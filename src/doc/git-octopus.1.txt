@@ -1,6 +1,6 @@
 :man manual:   git-octopus suit Manual
 :man source:   git-octopus
-:man version:  1.3
+:man version:  1.4
 
 git-octopus(1)
 ==============
