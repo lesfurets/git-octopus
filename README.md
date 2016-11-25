@@ -26,6 +26,8 @@ Make sure the installation works
 git octopus -v
 ```
 
+>We respect [semver](http://semver.org/)
+
 ## What you'll find
 Two additionnal git commands : 
 
