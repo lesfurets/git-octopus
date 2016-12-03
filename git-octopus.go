@@ -1,20 +1,20 @@
 package main
 
-import "fmt"
-import "flag"
-
-var printVersion bool
+import (
+	"fmt"
+	"os"
+)
 
 func main() {
-	flag.BoolVar(&printVersion, "v", false, "prints the version of git-octopus")
-
-	flag.Parse()
-
-	mainWithArgs(printVersion)
+	mainWithArgs(".", os.Args[1:])
 }
 
-func mainWithArgs(printVersion bool) {
-	if printVersion {
-		fmt.Printf("2.0")
+func mainWithArgs(pwd string, args []string) {
+
+	octopusConfig := getOctopusConfig(pwd, args)
+
+	if octopusConfig.printVersion {
+		fmt.Printf("2.0\n")
+		return
 	}
 }
