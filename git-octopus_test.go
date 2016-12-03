@@ -1,9 +1,6 @@
 package main
 
-import "os"
-
 func ExampleVersionShort() {
-	os.Args = []string{"git-octopus", "-v"}
-	mainWithArgs(true)
+	mainWithArgs(".", []string{"-v"})
 	// Output: 2.0
 }
