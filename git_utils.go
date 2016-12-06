@@ -16,7 +16,7 @@ func git(repoPath string, args ...string) string {
 	return strings.TrimSpace(string(out[:]))
 }
 
-// Takes the output of git-ls-remote. Returns a map sha1 => refsname
+// Takes the output of git-ls-remote. Returns a map refsname => sha1
 func parseLsRemote(lsRemoteOutput string) map[string]string {
 	result := map[string]string{}
 
@@ -29,7 +29,7 @@ func parseLsRemote(lsRemoteOutput string) map[string]string {
 	for scanner.Scan() {
 		split := strings.Split(scanner.Text(), "\t")
 
-		result[split[0]] = split[1]
+		result[split[1]] = split[0]
 	}
 
 	return result
