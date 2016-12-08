@@ -43,11 +43,11 @@ type repository struct {
 func createRepo() *repository {
 	dir, _ := ioutil.TempDir("", "git-octopus-test-")
 
-	repository := repository{ path: dir}
+	repo := repository{path: dir}
 
-	git(dir, "init")
+	repo.git("init")
 
-	return &repository
+	return &repo
 }
 
 func (repo *repository) git(args ...string) string {

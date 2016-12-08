@@ -6,7 +6,8 @@ import (
 )
 
 func ExampleVersionShort() {
-	mainWithArgs(".", []string{"-v"})
+	repo := createRepo()
+	mainWithArgs(repo, []string{"-v"})
 	// Output: 2.0
 }
 
@@ -15,7 +16,7 @@ func TestResolveBranchListSimple(t *testing.T) {
 	repo.run("git-octopus_test.sh")
 	head := repo.git("rev-parse", "HEAD")
 
-	branchList := resolveBranchList(repo.path, []string {"refs/heads/*"}, nil)
+	branchList := resolveBranchList(repo, []string {"refs/heads/*"}, nil)
 
 	expected := map[string]string{
 		"refs/heads/master": head,
@@ -32,7 +33,7 @@ func TestResolveBranchListExclusion(t *testing.T) {
 	repo.run("git-octopus_test.sh")
 	head := repo.git("rev-parse", "HEAD")
 
-	branchList := resolveBranchList(repo.path, []string {"refs/heads/*", "remotes/origin/*"}, []string {"*/test1", "master"})
+	branchList := resolveBranchList(repo, []string {"refs/heads/*", "remotes/origin/*"}, []string {"*/test1", "master"})
 
 	expected := map[string]string{
 		"refs/remotes/origin/test2": head,
