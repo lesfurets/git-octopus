@@ -1,13 +1,13 @@
 package main
 
 import (
-	"os/exec"
-	"strings"
 	"bufio"
+	"fmt"
+	"io/ioutil"
+	"os/exec"
 	"path/filepath"
 	"runtime"
-	"io/ioutil"
-	"fmt"
+	"strings"
 )
 
 func git(repoPath string, args ...string) string {
@@ -34,7 +34,6 @@ func parseLsRemote(lsRemoteOutput string) map[string]string {
 
 	return result
 }
-
 
 type repository struct {
 	path string
