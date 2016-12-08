@@ -1,21 +1,29 @@
-#git-octopus
+# git-octopus
 >The continuous merge workflow is meant for continuous integration/delivery and is based on feature branching. git-octopus provides git commands to implement it.
 
-##Installation
+## Installation
 
-###Requirements
+### Requirements
 Requires git >= 1.8
 
 You need to have a command `shasum` in the path. This is the case on most unix based systems. If you're on Windows/Cygwin you may have to install it.
 
-###Homebrew
+### Homebrew
 If you know and use [Homebrew](http://brew.sh), you just need to do:
 ```bash
 brew update
 brew install git-octopus
 ```
+### RPM package manager
 
-###From sources
+The packaging is temporarily hosted on [Fedora copr](https://copr.fedorainfracloud.org/coprs/baitaand/git-octopus/build/484097/):
+
+```bash
+dnf copr enable baitaand/git-octopus
+dnf install git-octopus
+```
+
+### From sources
 Download the latest [release](https://github.com/lesfurets/git-octopus/releases/latest) or clone this repository. Go into the directory and type
 ```bash
 make install
@@ -44,14 +52,14 @@ Allows you to record conflicts resolutions that `git octopus` can reuse.
 Conflicts resolutions are standard refs so they can be pushed/fetched.
 See the conflicts management section bellow and [git-conflict(1)](http://lesfurets.github.io/git-octopus/doc/git-conflict.html).
 
-##The Continuous Merge
+## The Continuous Merge
 
 ### What is it all about ?
 Feature branching and continuous integration don't live well together. The idea of this project is to reconcile those two by using the mighty power of git.
 
 I gave a talk about why and how to use it at Devoxx France 2015, but it's in french ;) https://www.parleys.com/tutorial/le-continuous-merge-chez-lesfurets-com
 
-###The branching model
+### The branching model
 The simpliest form of the model is to have a mainline branch, let's call it `master`, and feature branches on top of that master. In a continuous delivery workflow you won't need more than that. 
 
 * The `master` branch, or however you call it, is in a ready-to-ship state. Nobody commits on it.
@@ -59,7 +67,7 @@ The simpliest form of the model is to have a mainline branch, let's call it `mas
 
 This means that all the work is done in feature branches. Don't be afraid to have many, one branch per developer is fine. Keep feature branches independent from each other, that's the key for having a fluent delivery pipe.
 
-###The workflow
+### The workflow
 `git octopus` allows you to merge all you feature branches together at any moment so you can have an assembly of all the work that is going on and finally do a continuous integration job on that merge. here's how it works : 
 
 A developer pushes a change on his feature branch. There is a job in your continuous integration system that will trigger and do this bash command :
