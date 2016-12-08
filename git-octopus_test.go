@@ -1,8 +1,8 @@
 package main
 
 import (
-	"testing"
 	"reflect"
+	"testing"
 )
 
 func ExampleVersionShort() {
@@ -16,11 +16,11 @@ func TestResolveBranchListSimple(t *testing.T) {
 	repo.run("git-octopus_test.sh")
 	head := repo.git("rev-parse", "HEAD")
 
-	branchList := resolveBranchList(repo, []string {"refs/heads/*"}, nil)
+	branchList := resolveBranchList(repo, []string{"refs/heads/*"}, nil)
 
 	expected := map[string]string{
 		"refs/heads/master": head,
-		"refs/heads/test1": head,
+		"refs/heads/test1":  head,
 	}
 
 	if !reflect.DeepEqual(branchList, expected) {
@@ -33,7 +33,7 @@ func TestResolveBranchListExclusion(t *testing.T) {
 	repo.run("git-octopus_test.sh")
 	head := repo.git("rev-parse", "HEAD")
 
-	branchList := resolveBranchList(repo, []string {"refs/heads/*", "remotes/origin/*"}, []string {"*/test1", "master"})
+	branchList := resolveBranchList(repo, []string{"refs/heads/*", "remotes/origin/*"}, []string{"*/test1", "master"})
 
 	expected := map[string]string{
 		"refs/remotes/origin/test2": head,

@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	repo := repository{ path: "."}
+	repo := repository{path: "."}
 	mainWithArgs(&repo, os.Args[1:])
 }
 
@@ -21,12 +21,12 @@ func mainWithArgs(repo *repository, args []string) {
 }
 
 func resolveBranchList(repo *repository, patterns []string, excludedPatterns []string) map[string]string {
-	result :=   parseLsRemote(repo.git(append([]string{"ls-remote", "."}, patterns...)...))
+	result := parseLsRemote(repo.git(append([]string{"ls-remote", "."}, patterns...)...))
 
 	if len(excludedPatterns) == 0 {
 		return result
 	}
-	
+
 	excludedRefs := parseLsRemote(repo.git(append([]string{"ls-remote", "."}, excludedPatterns...)...))
 	for excludedRef, _ := range excludedRefs {
 		delete(result, excludedRef)

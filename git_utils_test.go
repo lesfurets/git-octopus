@@ -17,7 +17,7 @@ func TestParseLsRemote(t *testing.T) {
 	if !reflect.DeepEqual(
 		parseLsRemote(lsRemoteOutput),
 		map[string]string{
-			"refs/heads/master": "d8dd4eadaf3c1075eff3b7d4fe6bec5fbfe76b4c",
+			"refs/heads/master":     "d8dd4eadaf3c1075eff3b7d4fe6bec5fbfe76b4c",
 			"refs/heads/go_rewrite": "5b2b1bf1cdf1150f34bd5809a038b292dc560998"}) {
 		t.Error()
 	}
