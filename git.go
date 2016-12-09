@@ -2,16 +2,11 @@ package main
 
 import (
 	"bufio"
-	"os"
+	"io/ioutil"
 	"os/exec"
 	"path/filepath"
 	"strings"
 )
-
-func git(repoPath string, args ...string) string {
-	out, _ := exec.Command("git", append([]string{"-C", repoPath}, args...)...).Output()
-	return strings.TrimSpace(string(out[:]))
-}
 
 // Takes the output of git-ls-remote. Returns a map refsname => sha1
 func parseLsRemote(lsRemoteOutput string) map[string]string {
@@ -36,20 +31,15 @@ type repository struct {
 	path string
 }
 
-func (repo *repository) git(args ...string) string {
-	return git(repo.path, args...)
+func (repo *repository) git(args ...string) (string, error) {
+	out, err := exec.Command("git", append([]string{"-C", repo.path}, args...)...).Output()
+
+	stringOut := strings.TrimSpace(string(out[:]))
+
+	return stringOut, err
 }
 
 func (repo *repository) writeFile(name string, lines ...string) {
 	fileName := filepath.Join(repo.path, name)
-	_, err := os.Stat(fileName)
-
-	var file *os.File
-	if os.IsNotExist(err) {
-		file, _ = os.Create(fileName)
-	} else {
-		file, _ = os.Open(fileName)
-	}
-
-	file.WriteString(strings.Join(lines, "\n"))
+	ioutil.WriteFile(fileName, []byte(strings.Join(lines, "\n")), 0644)
 }

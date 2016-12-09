@@ -40,7 +40,8 @@ func getOctopusConfig(repo *repository, args []string) *octopusConfig {
 
 	commandLine.Parse(args)
 
-	configCommit, err := strconv.ParseBool(repo.git("config", "octopus.commit"))
+	rawConfigCommit, _ := repo.git("config", "octopus.commit")
+	configCommit, err := strconv.ParseBool(rawConfigCommit)
 	if err != nil {
 		configCommit = true
 	}
@@ -53,7 +54,7 @@ func getOctopusConfig(repo *repository, args []string) *octopusConfig {
 		configCommit = false
 	}
 
-	configExcludedPatterns := repo.git("config", "--get-all", "octopus.excludePattern")
+	configExcludedPatterns, _ := repo.git("config", "--get-all", "octopus.excludePattern")
 
 	var excludedPatterns []string
 
@@ -65,7 +66,7 @@ func getOctopusConfig(repo *repository, args []string) *octopusConfig {
 		excludedPatterns = excludedPatternsArg
 	}
 
-	configPatterns := repo.git("config", "--get-all", "octopus.pattern")
+	configPatterns, _ := repo.git("config", "--get-all", "octopus.pattern")
 
 	var patterns []string
 
