@@ -13,7 +13,7 @@ func main() {
 
 func mainWithArgs(repo *repository, args ...string) {
 
-	octopusConfig := getOctopusConfig(repo, args)
+	octopusConfig, _ := getOctopusConfig(repo, args)
 
 	if octopusConfig.printVersion {
 		fmt.Println("2.0")
