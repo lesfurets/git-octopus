@@ -2,13 +2,14 @@ package main
 
 import (
 	"bufio"
+	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 )
 
 func git(repoPath string, args ...string) string {
 	out, _ := exec.Command("git", append([]string{"-C", repoPath}, args...)...).Output()
-
 	return strings.TrimSpace(string(out[:]))
 }
 
@@ -37,4 +38,18 @@ type repository struct {
 
 func (repo *repository) git(args ...string) string {
 	return git(repo.path, args...)
+}
+
+func (repo *repository) writeFile(name string, lines ...string) {
+	fileName := filepath.Join(repo.path, name)
+	_, err := os.Stat(fileName)
+
+	var file *os.File
+	if os.IsNotExist(err) {
+		file, _ = os.Create(fileName)
+	} else {
+		file, _ = os.Open(fileName)
+	}
+
+	file.WriteString(strings.Join(lines, "\n"))
 }

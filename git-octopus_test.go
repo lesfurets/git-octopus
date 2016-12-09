@@ -1,8 +1,10 @@
 package main
 
 import (
+	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"os"
+	"testing"
 )
 
 func createTestRepo() *repository {
@@ -42,4 +44,21 @@ func ExampleOctopusNoBranchMatching() {
 
 	mainWithArgs(repo, "refs/remotes/dumb/*", "refs/remotes/dumber/*")
 	// Output: No branch matching "refs/remotes/dumb/* refs/remotes/dumber/*" were found
+}
+
+func TestOctopusAlreadyUpToDate(t *testing.T) {
+	repo := createTestRepo()
+	defer cleanupTestRepo(repo)
+
+	repo.writeFile("foo", "First line")
+	repo.git("add", "foo")
+	repo.git("commit", "-m\"first commit\"")
+	// Create a branch on this first commit
+	repo.git("branch", "outdated_branch")
+
+	head := repo.git("rev-parse", "HEAD")
+
+	mainWithArgs(repo, "outdated_branch")
+
+	assert.Equal(t, head, repo.git("rev-parse", "HEAD"))
 }
