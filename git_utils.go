@@ -2,11 +2,8 @@ package main
 
 import (
 	"bufio"
-	"fmt"
 	"io/ioutil"
 	"os/exec"
-	"path/filepath"
-	"runtime"
 	"strings"
 )
 
@@ -51,15 +48,4 @@ func createRepo() *repository {
 
 func (repo *repository) git(args ...string) string {
 	return git(repo.path, args...)
-}
-
-func (repo *repository) run(script string) {
-	_, file, _, _ := runtime.Caller(0)
-	scriptPath := filepath.Join(filepath.Dir(file), script)
-	cmd := exec.Command(scriptPath)
-	cmd.Dir = repo.path
-	err := cmd.Run()
-	if err != nil {
-		fmt.Println(err)
-	}
 }
