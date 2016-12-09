@@ -30,6 +30,16 @@ func ExampleVersionShort() {
 	// Output: 2.0
 }
 
+func TestOctopusCommitConfigError(t *testing.T) {
+	repo := createTestRepo()
+
+	repo.git("config", "octopus.commit", "bad_value")
+
+	err := mainWithArgs(repo, "-v")
+
+	assert.NotNil(t, err)
+}
+
 func ExampleOctopusNoPatternGiven() {
 	repo := createTestRepo()
 	defer cleanupTestRepo(repo)
