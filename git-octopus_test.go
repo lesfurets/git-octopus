@@ -55,10 +55,11 @@ func TestOctopusAlreadyUpToDate(t *testing.T) {
 	repo.git("commit", "-m\"first commit\"")
 	// Create a branch on this first commit
 	repo.git("branch", "outdated_branch")
-
-	head := repo.git("rev-parse", "HEAD")
+	expected, _ := repo.git("rev-parse", "HEAD")
 
 	mainWithArgs(repo, "outdated_branch")
 
-	assert.Equal(t, head, repo.git("rev-parse", "HEAD"))
+	actual, _ := repo.git("rev-parse", "HEAD")
+
+	assert.Equal(t, expected, actual)
 }
