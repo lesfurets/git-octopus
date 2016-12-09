@@ -15,6 +15,9 @@ generate_docs = asciidoc -d manpage --out-file=doc/$(1).html src/doc/$(1).1.txt 
 install_docs = cp -f doc/$(1).1 $(man1dir)/$(1).1 \
 	&& cp -f doc/$(1).html $(htmldir)
 
+fmt:
+	gofmt -w *.go
+
 build:
 	@mkdir -p bin
 	$(call cat_scripts,git-octopus,src/lib/common,src/lib/git-merge-octopus-fork.sh,src/git-octopus)

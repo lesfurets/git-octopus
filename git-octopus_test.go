@@ -11,9 +11,19 @@ func ExampleVersionShort() {
 	// Output: 2.0
 }
 
-func TestResolveBranchListSimple(t *testing.T) {
+func initRepo() *repository {
 	repo := createRepo()
-	repo.run("git-octopus_test.sh")
+	repo.git("commit", "--allow-empty", "-m\"first commit\"")
+	head := repo.git("rev-parse", "HEAD")
+	repo.git("update-ref", "refs/heads/test1", head)
+	repo.git("update-ref", "refs/remotes/origin/test1", head)
+	repo.git("update-ref", "refs/remotes/origin/test2", head)
+
+	return repo
+}
+
+func TestResolveBranchListSimple(t *testing.T) {
+	repo := initRepo()
 	head := repo.git("rev-parse", "HEAD")
 
 	branchList := resolveBranchList(repo, []string{"refs/heads/*"}, nil)
@@ -29,8 +39,7 @@ func TestResolveBranchListSimple(t *testing.T) {
 }
 
 func TestResolveBranchListExclusion(t *testing.T) {
-	repo := createRepo()
-	repo.run("git-octopus_test.sh")
+	repo := initRepo()
 	head := repo.git("rev-parse", "HEAD")
 
 	branchList := resolveBranchList(repo, []string{"refs/heads/*", "remotes/origin/*"}, []string{"*/test1", "master"})
