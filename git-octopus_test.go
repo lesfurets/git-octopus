@@ -7,7 +7,7 @@ import (
 
 func ExampleVersionShort() {
 	repo := createRepo()
-	mainWithArgs(repo, []string{"-v"})
+	mainWithArgs(repo, "-v")
 	// Output: 2.0
 }
 
@@ -51,4 +51,16 @@ func TestResolveBranchListExclusion(t *testing.T) {
 	if !reflect.DeepEqual(branchList, expected) {
 		t.Error(branchList)
 	}
+}
+
+func ExampleOctopusNoPatternGiven() {
+	repo := createRepo()
+	mainWithArgs(repo)
+	// Output: Nothing to merge. No pattern given
+}
+
+func ExampleOctopusNoBranchMatching() {
+	repo := createRepo()
+	mainWithArgs(repo, "refs/remotes/dumb/*", "refs/remotes/dumber/*")
+	// Output: No branch matching "refs/remotes/dumb/* refs/remotes/dumber/*" were found
 }
