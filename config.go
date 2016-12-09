@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"strconv"
 	"strings"
@@ -47,7 +48,10 @@ func getOctopusConfig(repo *repository, args []string) (*octopusConfig, error) {
 	if err != nil {
 		configCommit = true
 	} else {
-		configCommit, _ = strconv.ParseBool(rawConfigCommit)
+		configCommit, err = strconv.ParseBool(rawConfigCommit)
+		if err != nil {
+			return nil, errors.New("Config octopus.commit should be boolean. Given \"" + rawConfigCommit + "\"")
+		}
 	}
 
 	if commitArg {
