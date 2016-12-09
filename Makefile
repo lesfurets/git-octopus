@@ -50,3 +50,9 @@ uninstall:
 	rm $(man1dir)/git-conflict.1
 	rm $(htmldir)/git-octopus.html
 	rm $(htmldir)/git-conflict.html
+
+clean:
+	rm $(bindir)/git-octopus
+	rm $(bindir)/git-conflict
+	rm $(bindir)/git-apply-conflict-resolution
+

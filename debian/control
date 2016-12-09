@@ -1,0 +1,16 @@
+Source: git-octopus
+Section: devel
+Priority: extra
+Maintainer: lesfurets <alexandre.dubreuil@lesfurets.com>
+Build-Depends: debhelper (>=9)
+Standards-Version: 3.9.8
+Homepage: https://github.com/lesfurets/git-octopus
+
+Package: git-octopus
+Architecture: any
+Multi-Arch: foreign
+Depends: ${misc:Depends}, ${shlibs:Depends}
+Description: The continuous merge workflow
+ The continuous merge workflow is meant for continuous integration/delivery and
+ is based on feature branching. git-octopus provides git commands to implement
+ it.

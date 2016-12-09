@@ -1,0 +1,2 @@
+# git-build-recipe format 0.4 deb-version {debupstream}-1~{revtime}
+lp:~lesfurets.com/git-octopus/+git/trunk launchpad-build
