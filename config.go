@@ -25,7 +25,7 @@ func (e *excluded_patterns) Set(value string) error {
 	return nil
 }
 
-func getOctopusConfig(repo *repository, args []string) *octopusConfig {
+func getOctopusConfig(repo *repository, args []string) (*octopusConfig, error) {
 
 	var printVersion, noCommitArg, commitArg bool
 	var chunkSizeArg int
@@ -40,10 +40,14 @@ func getOctopusConfig(repo *repository, args []string) *octopusConfig {
 
 	commandLine.Parse(args)
 
-	rawConfigCommit, _ := repo.git("config", "octopus.commit")
-	configCommit, err := strconv.ParseBool(rawConfigCommit)
+	var configCommit bool
+
+	rawConfigCommit, err := repo.git("config", "octopus.commit")
+
 	if err != nil {
 		configCommit = true
+	} else {
+		configCommit, _ = strconv.ParseBool(rawConfigCommit)
 	}
 
 	if commitArg {
@@ -84,5 +88,5 @@ func getOctopusConfig(repo *repository, args []string) *octopusConfig {
 		chunkSize:        chunkSizeArg,
 		excludedPatterns: excludedPatterns,
 		patterns:         patterns,
-	}
+	}, nil
 }
