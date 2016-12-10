@@ -1,33 +1,35 @@
 package main
 
 import (
+	"io/ioutil"
 	"os"
 )
 
-func ExampleVersionShort() {
-	repo := createRepo()
-	defer cleanupTestRepo(repo)
-	mainWithArgs(repo, "-v")
-	// Output: 2.0
-}
+func createTestRepo() *repository {
+	dir, _ := ioutil.TempDir("", "git-octopus-test-")
 
-func initRepo() *repository {
-	repo := createRepo()
+	repo := repository{path: dir}
+
+	repo.git("init")
 	repo.git("commit", "--allow-empty", "-m\"first commit\"")
-	head := repo.git("rev-parse", "HEAD")
-	repo.git("update-ref", "refs/heads/test1", head)
-	repo.git("update-ref", "refs/remotes/origin/test1", head)
-	repo.git("update-ref", "refs/remotes/origin/test2", head)
 
-	return repo
+	return &repo
 }
 
 func cleanupTestRepo(repo *repository) error {
 	return os.RemoveAll(repo.path)
 }
 
+func ExampleVersionShort() {
+	repo := createTestRepo()
+	defer cleanupTestRepo(repo)
+
+	mainWithArgs(repo, "-v")
+	// Output: 2.0
+}
+
 func ExampleOctopusNoPatternGiven() {
-	repo := createRepo()
+	repo := createTestRepo()
 	defer cleanupTestRepo(repo)
 
 	mainWithArgs(repo)
@@ -35,7 +37,7 @@ func ExampleOctopusNoPatternGiven() {
 }
 
 func ExampleOctopusNoBranchMatching() {
-	repo := createRepo()
+	repo := createTestRepo()
 	defer cleanupTestRepo(repo)
 
 	mainWithArgs(repo, "refs/remotes/dumb/*", "refs/remotes/dumber/*")
