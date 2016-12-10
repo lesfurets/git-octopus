@@ -3,21 +3,22 @@ package main
 import (
 	"io/ioutil"
 	"os"
+	"github.com/lesfurets/git-octopus/git"
 )
 
-func createTestRepo() *repository {
+func createTestRepo() *git.Repository {
 	dir, _ := ioutil.TempDir("", "git-octopus-test-")
 
-	repo := repository{path: dir}
+	repo := git.Repository{Path: dir}
 
-	repo.git("init")
-	repo.git("commit", "--allow-empty", "-m\"first commit\"")
+	repo.Git("init")
+	repo.Git("commit", "--allow-empty", "-m\"first commit\"")
 
 	return &repo
 }
 
-func cleanupTestRepo(repo *repository) error {
-	return os.RemoveAll(repo.path)
+func cleanupTestRepo(repo *git.Repository) error {
+	return os.RemoveAll(repo.Path)
 }
 
 func ExampleVersionShort() {

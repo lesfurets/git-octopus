@@ -4,14 +4,15 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"github.com/lesfurets/git-octopus/git"
 )
 
 func main() {
-	repo := repository{path: "."}
+	repo := git.Repository{Path: "."}
 	mainWithArgs(&repo, os.Args[1:]...)
 }
 
-func mainWithArgs(repo *repository, args ...string) {
+func mainWithArgs(repo *git.Repository, args ...string) {
 
 	octopusConfig := getOctopusConfig(repo, args)
 

@@ -4,6 +4,7 @@ import (
 	"flag"
 	"strconv"
 	"strings"
+	"github.com/lesfurets/git-octopus/git"
 )
 
 type octopusConfig struct {
@@ -25,7 +26,7 @@ func (e *excluded_patterns) Set(value string) error {
 	return nil
 }
 
-func getOctopusConfig(repo *repository, args []string) *octopusConfig {
+func getOctopusConfig(repo *git.Repository, args []string) *octopusConfig {
 
 	var printVersion, noCommitArg, commitArg bool
 	var chunkSizeArg int
@@ -40,7 +41,7 @@ func getOctopusConfig(repo *repository, args []string) *octopusConfig {
 
 	commandLine.Parse(args)
 
-	configCommit, err := strconv.ParseBool(repo.git("config", "octopus.commit"))
+	configCommit, err := strconv.ParseBool(repo.Git("config", "octopus.commit"))
 	if err != nil {
 		configCommit = true
 	}
@@ -53,7 +54,7 @@ func getOctopusConfig(repo *repository, args []string) *octopusConfig {
 		configCommit = false
 	}
 
-	configExcludedPatterns := repo.git("config", "--get-all", "octopus.excludePattern")
+	configExcludedPatterns := repo.Git("config", "--get-all", "octopus.excludePattern")
 
 	var excludedPatterns []string
 
@@ -65,7 +66,7 @@ func getOctopusConfig(repo *repository, args []string) *octopusConfig {
 		excludedPatterns = excludedPatternsArg
 	}
 
-	configPatterns := repo.git("config", "--get-all", "octopus.pattern")
+	configPatterns := repo.Git("config", "--get-all", "octopus.pattern")
 
 	var patterns []string
 

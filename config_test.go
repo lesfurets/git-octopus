@@ -16,7 +16,7 @@ func TestDoCommit(t *testing.T) {
 	}
 
 	// Config to false, no option. doCommit should be false
-	repo.git("config", "octopus.commit", "false")
+	repo.Git("config", "octopus.commit", "false")
 	octopusConfig = getOctopusConfig(repo, nil)
 
 	if octopusConfig.doCommit {
@@ -24,7 +24,7 @@ func TestDoCommit(t *testing.T) {
 	}
 
 	// Config to false, -c option takes precedence. doCommit should be true
-	repo.git("config", "octopus.commit", "false")
+	repo.Git("config", "octopus.commit", "false")
 	octopusConfig = getOctopusConfig(repo, []string{"-c"})
 
 	if !octopusConfig.doCommit {
@@ -32,7 +32,7 @@ func TestDoCommit(t *testing.T) {
 	}
 
 	// Config to true, -n option takes precedence. doCommit should be false
-	repo.git("config", "octopus.commit", "true")
+	repo.Git("config", "octopus.commit", "true")
 	octopusConfig = getOctopusConfig(repo, []string{"-n"})
 
 	if octopusConfig.doCommit {
@@ -69,8 +69,8 @@ func TestExcludedPatterns(t *testing.T) {
 	}
 
 	// Config given, no option. excludedPatterns should be set
-	repo.git("config", "octopus.excludePattern", "excluded/*")
-	repo.git("config", "--add", "octopus.excludePattern", "excluded_branch")
+	repo.Git("config", "octopus.excludePattern", "excluded/*")
+	repo.Git("config", "--add", "octopus.excludePattern", "excluded_branch")
 	octopusConfig = getOctopusConfig(repo, nil)
 
 	if !reflect.DeepEqual(octopusConfig.excludedPatterns, []string{"excluded/*", "excluded_branch"}) {
@@ -96,8 +96,8 @@ func TestPatterns(t *testing.T) {
 	}
 
 	// Config given, no argument. patterns should be set
-	repo.git("config", "octopus.pattern", "test")
-	repo.git("config", "--add", "octopus.pattern", "test2")
+	repo.Git("config", "octopus.pattern", "test")
+	repo.Git("config", "--add", "octopus.pattern", "test2")
 	octopusConfig = getOctopusConfig(repo, nil)
 
 	if !reflect.DeepEqual(octopusConfig.patterns, []string{"test", "test2"}) {

@@ -1,4 +1,4 @@
-package main
+package git
 
 import (
 	"bufio"
@@ -13,7 +13,7 @@ func git(repoPath string, args ...string) string {
 }
 
 // Takes the output of git-ls-remote. Returns a map refsname => sha1
-func parseLsRemote(lsRemoteOutput string) map[string]string {
+func ParseLsRemote(lsRemoteOutput string) map[string]string {
 	result := map[string]string{}
 
 	if len(lsRemoteOutput) == 0 {
@@ -31,10 +31,10 @@ func parseLsRemote(lsRemoteOutput string) map[string]string {
 	return result
 }
 
-type repository struct {
-	path string
+type Repository struct {
+	Path string
 }
 
-func (repo *repository) git(args ...string) string {
-	return git(repo.path, args...)
+func (repo *Repository) Git(args ...string) string {
+	return git(repo.Path, args...)
 }
