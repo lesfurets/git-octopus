@@ -6,7 +6,7 @@ import (
 )
 
 func TestDoCommit(t *testing.T) {
-	repo := createRepo()
+	repo := createTestRepo()
 
 	// No config, no option. doCommit should be true
 	octopusConfig := getOctopusConfig(repo, nil)
@@ -41,7 +41,7 @@ func TestDoCommit(t *testing.T) {
 }
 
 func TestChunkMode(t *testing.T) {
-	repo := createRepo()
+	repo := createTestRepo()
 
 	// No option. chunkSize should be set to 0
 	octopusConfig := getOctopusConfig(repo, nil)
@@ -59,7 +59,7 @@ func TestChunkMode(t *testing.T) {
 }
 
 func TestExcludedPatterns(t *testing.T) {
-	repo := createRepo()
+	repo := createTestRepo()
 
 	// No config, no option. excludedPatterns should be empty
 	octopusConfig := getOctopusConfig(repo, nil)
@@ -86,7 +86,7 @@ func TestExcludedPatterns(t *testing.T) {
 }
 
 func TestPatterns(t *testing.T) {
-	repo := createRepo()
+	repo := createTestRepo()
 
 	// No config, no option. excludedPatterns should be empty
 	octopusConfig := getOctopusConfig(repo, nil)
