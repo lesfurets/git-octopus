@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"reflect"
 	"testing"
 )
@@ -22,8 +23,14 @@ func initRepo() *repository {
 	return repo
 }
 
+func cleanupTestRepo(repo *repository) error {
+	return os.RemoveAll(repo.path)
+}
+
 func TestResolveBranchListSimple(t *testing.T) {
 	repo := initRepo()
+	defer cleanupTestRepo(repo)
+
 	head := repo.git("rev-parse", "HEAD")
 
 	branchList := resolveBranchList(repo, []string{"refs/heads/*"}, nil)
@@ -40,6 +47,8 @@ func TestResolveBranchListSimple(t *testing.T) {
 
 func TestResolveBranchListExclusion(t *testing.T) {
 	repo := initRepo()
+	defer cleanupTestRepo(repo)
+
 	head := repo.git("rev-parse", "HEAD")
 
 	branchList := resolveBranchList(repo, []string{"refs/heads/*", "remotes/origin/*"}, []string{"*/test1", "master"})
@@ -55,12 +64,16 @@ func TestResolveBranchListExclusion(t *testing.T) {
 
 func ExampleOctopusNoPatternGiven() {
 	repo := createRepo()
+	defer cleanupTestRepo(repo)
+
 	mainWithArgs(repo)
 	// Output: Nothing to merge. No pattern given
 }
 
 func ExampleOctopusNoBranchMatching() {
 	repo := createRepo()
+	defer cleanupTestRepo(repo)
+
 	mainWithArgs(repo, "refs/remotes/dumb/*", "refs/remotes/dumber/*")
 	// Output: No branch matching "refs/remotes/dumb/* refs/remotes/dumber/*" were found
 }
