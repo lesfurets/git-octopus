@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"io/ioutil"
 	"os/exec"
 	"strings"
 )
@@ -34,16 +33,6 @@ func parseLsRemote(lsRemoteOutput string) map[string]string {
 
 type repository struct {
 	path string
-}
-
-func createRepo() *repository {
-	dir, _ := ioutil.TempDir("", "git-octopus-test-")
-
-	repo := repository{path: dir}
-
-	repo.git("init")
-
-	return &repo
 }
 
 func (repo *repository) git(args ...string) string {

@@ -5,8 +5,18 @@ import (
 	"testing"
 )
 
+func setupRepo() *repository {
+	repo := createTestRepo()
+	head := repo.git("rev-parse", "HEAD")
+	repo.git("update-ref", "refs/heads/test1", head)
+	repo.git("update-ref", "refs/remotes/origin/test1", head)
+	repo.git("update-ref", "refs/remotes/origin/test2", head)
+
+	return repo
+}
+
 func TestResolveBranchListSimple(t *testing.T) {
-	repo := initRepo()
+	repo := setupRepo()
 	defer cleanupTestRepo(repo)
 
 	head := repo.git("rev-parse", "HEAD")
@@ -24,7 +34,7 @@ func TestResolveBranchListSimple(t *testing.T) {
 }
 
 func TestResolveBranchListExclusion(t *testing.T) {
-	repo := initRepo()
+	repo := setupRepo()
 	defer cleanupTestRepo(repo)
 
 	head := repo.git("rev-parse", "HEAD")

@@ -6,7 +6,7 @@ import (
 )
 
 func TestDoCommit(t *testing.T) {
-	repo := createRepo()
+	repo := createTestRepo()
 	defer cleanupTestRepo(repo)
 
 	// No config, no option. doCommit should be true
@@ -42,7 +42,7 @@ func TestDoCommit(t *testing.T) {
 }
 
 func TestChunkMode(t *testing.T) {
-	repo := createRepo()
+	repo := createTestRepo()
 	defer cleanupTestRepo(repo)
 
 	// No option. chunkSize should be set to 0
@@ -61,7 +61,7 @@ func TestChunkMode(t *testing.T) {
 }
 
 func TestExcludedPatterns(t *testing.T) {
-	repo := createRepo()
+	repo := createTestRepo()
 	defer cleanupTestRepo(repo)
 
 	// No config, no option. excludedPatterns should be empty
@@ -89,7 +89,7 @@ func TestExcludedPatterns(t *testing.T) {
 }
 
 func TestPatterns(t *testing.T) {
-	repo := createRepo()
+	repo := createTestRepo()
 	defer cleanupTestRepo(repo)
 
 	// No config, no option. excludedPatterns should be empty
