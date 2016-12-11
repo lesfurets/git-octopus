@@ -1,7 +1,7 @@
 package main
 
 import (
-	"reflect"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
@@ -28,9 +28,7 @@ func TestResolveBranchListSimple(t *testing.T) {
 		"refs/heads/test1":  head,
 	}
 
-	if !reflect.DeepEqual(branchList, expected) {
-		t.Error(branchList)
-	}
+	assert.Equal(t, expected, branchList)
 }
 
 func TestResolveBranchListExclusion(t *testing.T) {
@@ -45,7 +43,5 @@ func TestResolveBranchListExclusion(t *testing.T) {
 		"refs/remotes/origin/test2": head,
 	}
 
-	if !reflect.DeepEqual(branchList, expected) {
-		t.Error(branchList)
-	}
+	assert.Equal(t, expected, branchList)
 }

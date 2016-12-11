@@ -1,7 +1,7 @@
 package main
 
 import (
-	"reflect"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
@@ -9,109 +9,109 @@ func TestDoCommit(t *testing.T) {
 	repo := createTestRepo()
 	defer cleanupTestRepo(repo)
 
-	// No config, no option. doCommit should be true
+	// GIVEN no config, no option
+	// WHEN
 	octopusConfig := getOctopusConfig(repo, nil)
 
-	if !octopusConfig.doCommit {
-		t.Error("Expected doCommit = true, got", octopusConfig.doCommit)
-	}
+	// THEN doCommit should be true
+	assert.True(t, octopusConfig.doCommit)
 
-	// Config to false, no option. doCommit should be false
+	// GIVEN config to false, no option
 	repo.git("config", "octopus.commit", "false")
+	// WHEN
 	octopusConfig = getOctopusConfig(repo, nil)
 
-	if octopusConfig.doCommit {
-		t.Error("Expected doCommit = false, got", octopusConfig.doCommit)
-	}
+	// THEN doCommit should be false
+	assert.False(t, octopusConfig.doCommit)
 
-	// Config to false, -c option takes precedence. doCommit should be true
+	// GIVEN config to false, -c option true
 	repo.git("config", "octopus.commit", "false")
+	// WHEN
 	octopusConfig = getOctopusConfig(repo, []string{"-c"})
 
-	if !octopusConfig.doCommit {
-		t.Error("Expected doCommit = true, got", octopusConfig.doCommit)
-	}
+	// THEN  doCommit should be true
+	assert.True(t, octopusConfig.doCommit)
 
-	// Config to true, -n option takes precedence. doCommit should be false
+	// GIVEN config to true, -n option true
 	repo.git("config", "octopus.commit", "true")
+	// WHEN
 	octopusConfig = getOctopusConfig(repo, []string{"-n"})
 
-	if octopusConfig.doCommit {
-		t.Error("Expected doCommit = false, got", octopusConfig.doCommit)
-	}
+	// THEN  doCommit should be false
+	assert.False(t, octopusConfig.doCommit)
 }
 
 func TestChunkMode(t *testing.T) {
 	repo := createTestRepo()
 	defer cleanupTestRepo(repo)
 
-	// No option. chunkSize should be set to 0
+	// GIVEN No option
+	// WHEN
 	octopusConfig := getOctopusConfig(repo, nil)
 
-	if octopusConfig.chunkSize != 0 {
-		t.Error("Expected chunkSize = 0, got", octopusConfig.chunkSize)
-	}
+	// THEN chunkSize should be 0
+	assert.Equal(t, 0, octopusConfig.chunkSize)
 
-	// -s 5, chunkSize should be set to 5
+	// GIVEN option -s 5
+	// WHEN
 	octopusConfig = getOctopusConfig(repo, []string{"-s", "5"})
 
-	if octopusConfig.chunkSize != 5 {
-		t.Error("Expected chunkSize = 5, got", octopusConfig.chunkSize)
-	}
+	// THEN chunkSize should be 5
+	assert.Equal(t, 5, octopusConfig.chunkSize)
 }
 
 func TestExcludedPatterns(t *testing.T) {
 	repo := createTestRepo()
 	defer cleanupTestRepo(repo)
 
-	// No config, no option. excludedPatterns should be empty
+	// GIVEN no config, no option
+	// WHEN
 	octopusConfig := getOctopusConfig(repo, nil)
 
-	if len(octopusConfig.excludedPatterns) > 0 {
-		t.Error("Expected excludedPatterns to be empty")
-	}
+	// THEN excludedPatterns should be empty
+	assert.Empty(t, octopusConfig.excludedPatterns)
 
-	// Config given, no option. excludedPatterns should be set
+	// GIVEN excludePattern config, no option
 	repo.git("config", "octopus.excludePattern", "excluded/*")
 	repo.git("config", "--add", "octopus.excludePattern", "excluded_branch")
+	// WHEN
 	octopusConfig = getOctopusConfig(repo, nil)
 
-	if !reflect.DeepEqual(octopusConfig.excludedPatterns, []string{"excluded/*", "excluded_branch"}) {
-		t.Error("actual excludedPatterns:", octopusConfig.excludedPatterns)
-	}
+	// THEN excludedPatterns should be set
+	assert.Equal(t, []string{"excluded/*", "excluded_branch"}, octopusConfig.excludedPatterns)
 
-	// Config given (from previous assertion), option given. Option should take precedence
+	// GIVEN excludePattern config (from previous assertion), option given
+	// WHEN
 	octopusConfig = getOctopusConfig(repo, []string{"-e", "override_excluded"})
 
-	if !reflect.DeepEqual(octopusConfig.excludedPatterns, []string{"override_excluded"}) {
-		t.Error("excludedPatterns", octopusConfig.excludedPatterns)
-	}
+	// THEN option should take precedence
+	assert.Equal(t, []string{"override_excluded"}, octopusConfig.excludedPatterns)
 }
 
 func TestPatterns(t *testing.T) {
 	repo := createTestRepo()
 	defer cleanupTestRepo(repo)
 
-	// No config, no option. excludedPatterns should be empty
+	// GIVEN no config, no option
+	// WHEN
 	octopusConfig := getOctopusConfig(repo, nil)
 
-	if len(octopusConfig.patterns) > 0 {
-		t.Error("Expected patterns to be empty")
-	}
+	// THEN excludedPatterns should be empty
+	assert.Empty(t, octopusConfig.patterns)
 
-	// Config given, no argument. patterns should be set
+	// GIVEN config, no argument.
 	repo.git("config", "octopus.pattern", "test")
 	repo.git("config", "--add", "octopus.pattern", "test2")
+	// WHEN
 	octopusConfig = getOctopusConfig(repo, nil)
 
-	if !reflect.DeepEqual(octopusConfig.patterns, []string{"test", "test2"}) {
-		t.Error("actual patterns:", octopusConfig.patterns)
-	}
+	// THEN patterns should be set
+	assert.Equal(t, []string{"test", "test2"}, octopusConfig.patterns)
 
-	// Config given (from previous assertion), argument given. Arguments should take precedence
+	// GIVEN config (from previous assertion), argument given
+	// WHEN
 	octopusConfig = getOctopusConfig(repo, []string{"arg1", "arg2"})
 
-	if !reflect.DeepEqual(octopusConfig.patterns, []string{"arg1", "arg2"}) {
-		t.Error("actual patterns:", octopusConfig.patterns)
-	}
+	// THEN arguments should take precedence
+	assert.Equal(t, []string{"arg1", "arg2"}, octopusConfig.patterns)
 }
