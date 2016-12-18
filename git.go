@@ -2,9 +2,7 @@ package main
 
 import (
 	"bufio"
-	"io/ioutil"
 	"os/exec"
-	"path/filepath"
 	"strings"
 )
 
@@ -37,9 +35,4 @@ func (repo *repository) git(args ...string) (string, error) {
 	stringOut := strings.TrimSpace(string(out[:]))
 
 	return stringOut, err
-}
-
-func (repo *repository) writeFile(name string, lines ...string) {
-	fileName := filepath.Join(repo.path, name)
-	ioutil.WriteFile(fileName, []byte(strings.Join(lines, "\n")), 0644)
 }

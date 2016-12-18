@@ -10,7 +10,7 @@ func resolveBranchList(repo *repository, patterns []string, excludedPatterns []s
 
 	lsRemote, _ = repo.git(append([]string{"ls-remote", "."}, excludedPatterns...)...)
 	excludedRefs := parseLsRemote(lsRemote)
-	for excludedRef, _ := range excludedRefs {
+	for excludedRef := range excludedRefs {
 		delete(result, excludedRef)
 	}
 
