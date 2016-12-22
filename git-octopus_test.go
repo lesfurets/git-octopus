@@ -1,15 +1,17 @@
 package main
 
 import (
+	"bytes"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 )
 
-func createTestRepo() *repository {
+func createTestContext() (*octopusContext, *bytes.Buffer) {
 	dir, _ := ioutil.TempDir("", "git-octopus-test-")
 
 	repo := repository{path: dir}
@@ -17,17 +19,18 @@ func createTestRepo() *repository {
 	repo.git("init")
 	repo.git("commit", "--allow-empty", "-m\"first commit\"")
 
-	return &repo
+	out := bytes.NewBufferString("")
+
+	context := octopusContext{
+		repo:   &repo,
+		logger: log.New(out, "", 0),
+	}
+
+	return &context, out
 }
 
-func cleanupTestRepo(repo *repository) error {
-	return os.RemoveAll(repo.path)
-}
-
-func testMain(repo *repository, args ...string) error {
-	context := octopusContext{repo: repo}
-
-	return run(&context, args...)
+func cleanup(context *octopusContext) error {
+	return os.RemoveAll(context.repo.path)
 }
 
 func (repo *repository) writeFile(name string, lines ...string) {
@@ -35,97 +38,100 @@ func (repo *repository) writeFile(name string, lines ...string) {
 	ioutil.WriteFile(fileName, []byte(strings.Join(lines, "\n")), 0644)
 }
 
-func ExampleVersionShort() {
-	repo := createTestRepo()
-	defer cleanupTestRepo(repo)
+func TestVersionShort(t *testing.T) {
+	context, out := createTestContext()
+	defer cleanup(context)
 
-	testMain(repo, "-v")
-	// Output: 2.0
+	run(context, "-v")
+
+	assert.Equal(t, "2.0\n", out.String())
 }
 
 func TestOctopusCommitConfigError(t *testing.T) {
-	repo := createTestRepo()
-	defer cleanupTestRepo(repo)
+	context, _ := createTestContext()
+	defer cleanup(context)
 
-	repo.git("config", "octopus.commit", "bad_value")
+	context.repo.git("config", "octopus.commit", "bad_value")
 
-	err := testMain(repo, "-v")
+	err := run(context, "-v")
 
 	assert.NotNil(t, err)
 }
 
-func ExampleOctopusNoPatternGiven() {
-	repo := createTestRepo()
-	defer cleanupTestRepo(repo)
+func TestOctopusNoPatternGiven(t *testing.T) {
+	context, out := createTestContext()
+	defer cleanup(context)
 
-	testMain(repo)
-	// Output: Nothing to merge. No pattern given
+	run(context)
+
+	assert.Equal(t, "Nothing to merge. No pattern given\n", out.String())
 }
 
-func ExampleOctopusNoBranchMatching() {
-	repo := createTestRepo()
-	defer cleanupTestRepo(repo)
+func TestOctopusNoBranchMatching(t *testing.T) {
+	context, out := createTestContext()
+	defer cleanup(context)
 
-	testMain(repo, "refs/remotes/dumb/*", "refs/remotes/dumber/*")
-	// Output: No branch matching "refs/remotes/dumb/* refs/remotes/dumber/*" were found
+	run(context, "refs/remotes/dumb/*", "refs/remotes/dumber/*")
+
+	assert.Equal(t, "No branch matching \"refs/remotes/dumb/* refs/remotes/dumber/*\" were found\n", out.String())
 }
 
 func TestOctopusAlreadyUpToDate(t *testing.T) {
-	repo := createTestRepo()
-	defer cleanupTestRepo(repo)
+	context, _ := createTestContext()
+	defer cleanup(context)
 
-	repo.writeFile("foo", "First line")
-	repo.git("add", "foo")
-	repo.git("commit", "-m\"first commit\"")
+	context.repo.writeFile("foo", "First line")
+	context.repo.git("add", "foo")
+	context.repo.git("commit", "-m\"first commit\"")
 	// Create a branch on this first commit
-	repo.git("branch", "outdated_branch")
-	expected, _ := repo.git("rev-parse", "HEAD")
+	context.repo.git("branch", "outdated_branch")
+	expected, _ := context.repo.git("rev-parse", "HEAD")
 
-	testMain(repo, "outdated_branch")
+	run(context, "outdated_branch")
 
-	actual, _ := repo.git("rev-parse", "HEAD")
+	actual, _ := context.repo.git("rev-parse", "HEAD")
 
 	assert.Equal(t, expected, actual)
 }
 
 func TestOctopus3branches(t *testing.T) {
-	repo := createTestRepo()
-	defer cleanupTestRepo(repo)
+	context, _ := createTestContext()
+	defer cleanup(context)
 
 	// Create and commit file foo1 in branch1
-	repo.git("checkout", "-b", "branch1")
-	repo.writeFile("foo1", "First line")
-	repo.git("add", "foo1")
-	repo.git("commit", "-m\"\"")
+	context.repo.git("checkout", "-b", "branch1")
+	context.repo.writeFile("foo1", "First line")
+	context.repo.git("add", "foo1")
+	context.repo.git("commit", "-m\"\"")
 
 	// Create and commit file foo2 in branch2
-	repo.git("checkout", "-b", "branch2", "master")
-	repo.writeFile("foo2", "First line")
-	repo.git("add", "foo2")
-	repo.git("commit", "-m\"\"")
+	context.repo.git("checkout", "-b", "branch2", "master")
+	context.repo.writeFile("foo2", "First line")
+	context.repo.git("add", "foo2")
+	context.repo.git("commit", "-m\"\"")
 
 	// Create and commit file foo3 in branch3
-	repo.git("checkout", "-b", "branch3", "master")
-	repo.writeFile("foo3", "First line")
-	repo.git("add", "foo3")
-	repo.git("commit", "-m\"\"")
+	context.repo.git("checkout", "-b", "branch3", "master")
+	context.repo.writeFile("foo3", "First line")
+	context.repo.git("add", "foo3")
+	context.repo.git("commit", "-m\"\"")
 
 	// Merge the 3 branches in master
-	repo.git("checkout", "master")
+	context.repo.git("checkout", "master")
 
-	err := testMain(repo, "branch*")
-
-	assert.Nil(t, err)
-
-	_, err = os.Open(filepath.Join(repo.path, "foo1"))
+	err := run(context, "branch*")
 
 	assert.Nil(t, err)
 
-	_, err = os.Open(filepath.Join(repo.path, "foo2"))
+	_, err = os.Open(filepath.Join(context.repo.path, "foo1"))
 
 	assert.Nil(t, err)
 
-	_, err = os.Open(filepath.Join(repo.path, "foo3"))
+	_, err = os.Open(filepath.Join(context.repo.path, "foo2"))
+
+	assert.Nil(t, err)
+
+	_, err = os.Open(filepath.Join(context.repo.path, "foo3"))
 
 	assert.Nil(t, err)
 }

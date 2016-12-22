@@ -5,23 +5,23 @@ import (
 	"testing"
 )
 
-func setupRepo() *repository {
-	repo := createTestRepo()
-	head, _ := repo.git("rev-parse", "HEAD")
-	repo.git("update-ref", "refs/heads/test1", head)
-	repo.git("update-ref", "refs/remotes/origin/test1", head)
-	repo.git("update-ref", "refs/remotes/origin/test2", head)
+func setupRepo() *octopusContext {
+	context, _ := createTestContext()
+	head, _ := context.repo.git("rev-parse", "HEAD")
+	context.repo.git("update-ref", "refs/heads/test1", head)
+	context.repo.git("update-ref", "refs/remotes/origin/test1", head)
+	context.repo.git("update-ref", "refs/remotes/origin/test2", head)
 
-	return repo
+	return context
 }
 
 func TestResolveBranchListSimple(t *testing.T) {
-	repo := setupRepo()
-	defer cleanupTestRepo(repo)
+	context := setupRepo()
+	defer cleanup(context)
 
-	head, _ := repo.git("rev-parse", "HEAD")
+	head, _ := context.repo.git("rev-parse", "HEAD")
 
-	branchList := resolveBranchList(repo, []string{"refs/heads/*"}, nil)
+	branchList := resolveBranchList(context.repo, []string{"refs/heads/*"}, nil)
 
 	expected := map[string]string{
 		"refs/heads/master": head,
@@ -32,12 +32,12 @@ func TestResolveBranchListSimple(t *testing.T) {
 }
 
 func TestResolveBranchListExclusion(t *testing.T) {
-	repo := setupRepo()
-	defer cleanupTestRepo(repo)
+	context := setupRepo()
+	defer cleanup(context)
 
-	head, _ := repo.git("rev-parse", "HEAD")
+	head, _ := context.repo.git("rev-parse", "HEAD")
 
-	branchList := resolveBranchList(repo, []string{"refs/heads/*", "remotes/origin/*"}, []string{"*/test1", "master"})
+	branchList := resolveBranchList(context.repo, []string{"refs/heads/*", "remotes/origin/*"}, []string{"*/test1", "master"})
 
 	expected := map[string]string{
 		"refs/remotes/origin/test2": head,
