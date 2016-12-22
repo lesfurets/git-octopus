@@ -24,6 +24,12 @@ func cleanupTestRepo(repo *repository) error {
 	return os.RemoveAll(repo.path)
 }
 
+func testMain(repo *repository, args ...string) error {
+	context := octopusContext{repo: repo}
+
+	return run(&context, args...)
+}
+
 func (repo *repository) writeFile(name string, lines ...string) {
 	fileName := filepath.Join(repo.path, name)
 	ioutil.WriteFile(fileName, []byte(strings.Join(lines, "\n")), 0644)
@@ -33,7 +39,7 @@ func ExampleVersionShort() {
 	repo := createTestRepo()
 	defer cleanupTestRepo(repo)
 
-	mainWithArgs(repo, "-v")
+	testMain(repo, "-v")
 	// Output: 2.0
 }
 
@@ -43,7 +49,7 @@ func TestOctopusCommitConfigError(t *testing.T) {
 
 	repo.git("config", "octopus.commit", "bad_value")
 
-	err := mainWithArgs(repo, "-v")
+	err := testMain(repo, "-v")
 
 	assert.NotNil(t, err)
 }
@@ -52,7 +58,7 @@ func ExampleOctopusNoPatternGiven() {
 	repo := createTestRepo()
 	defer cleanupTestRepo(repo)
 
-	mainWithArgs(repo)
+	testMain(repo)
 	// Output: Nothing to merge. No pattern given
 }
 
@@ -60,7 +66,7 @@ func ExampleOctopusNoBranchMatching() {
 	repo := createTestRepo()
 	defer cleanupTestRepo(repo)
 
-	mainWithArgs(repo, "refs/remotes/dumb/*", "refs/remotes/dumber/*")
+	testMain(repo, "refs/remotes/dumb/*", "refs/remotes/dumber/*")
 	// Output: No branch matching "refs/remotes/dumb/* refs/remotes/dumber/*" were found
 }
 
@@ -75,7 +81,7 @@ func TestOctopusAlreadyUpToDate(t *testing.T) {
 	repo.git("branch", "outdated_branch")
 	expected, _ := repo.git("rev-parse", "HEAD")
 
-	mainWithArgs(repo, "outdated_branch")
+	testMain(repo, "outdated_branch")
 
 	actual, _ := repo.git("rev-parse", "HEAD")
 
@@ -107,7 +113,7 @@ func TestOctopus3branches(t *testing.T) {
 	// Merge the 3 branches in master
 	repo.git("checkout", "master")
 
-	err := mainWithArgs(repo, "branch*")
+	err := testMain(repo, "branch*")
 
 	assert.Nil(t, err)
 

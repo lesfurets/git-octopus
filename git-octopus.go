@@ -5,22 +5,29 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"log"
 )
+
+type octopusContext struct {
+	repo *repository
+}
 
 func main() {
 	repo := repository{path: "."}
 
-	err := mainWithArgs(&repo, os.Args[1:]...)
+	context := octopusContext{repo: &repo}
+
+	err := run(&context, os.Args[1:]...)
 
 	if err != nil {
-		os.Stderr.WriteString(err.Error() + "\n")
+		log.Fatalln(err.Error())
 		os.Exit(1)
 	}
 }
 
-func mainWithArgs(repo *repository, args ...string) error {
+func run(context *octopusContext, args ...string) error {
 
-	octopusConfig, err := getOctopusConfig(repo, args)
+	octopusConfig, err := getOctopusConfig(context.repo, args)
 
 	if err != nil {
 		return err
@@ -36,35 +43,35 @@ func mainWithArgs(repo *repository, args ...string) error {
 		return nil
 	}
 
-	branchList := resolveBranchList(repo, octopusConfig.patterns, octopusConfig.excludedPatterns)
+	branchList := resolveBranchList(context.repo, octopusConfig.patterns, octopusConfig.excludedPatterns)
 
 	if len(branchList) == 0 {
 		fmt.Printf("No branch matching \"%v\" were found\n", strings.Join(octopusConfig.patterns, " "))
 		return nil
 	}
 
-	parents, err := mergeHeads(repo, branchList)
+	parents, err := mergeHeads(context, branchList)
 
 	if err != nil {
 		return err
 	}
 
 	if octopusConfig.doCommit {
-		tree, _ := repo.git("write-tree")
-		commit, _ := repo.git("commit-tree", "-p", strings.Join(parents, " -p "), "-m", octopusCommitMessage(branchList), tree)
-		repo.git("update-ref", "HEAD", commit)
+		tree, _ := context.repo.git("write-tree")
+		commit, _ := context.repo.git("commit-tree", "-p", strings.Join(parents, " -p "), "-m", octopusCommitMessage(branchList), tree)
+		context.repo.git("update-ref", "HEAD", commit)
 	}
 
 	return nil
 }
 
 // The logic of this function is copied directly from git-merge-octopus.sh
-func mergeHeads(repo *repository, remotes map[string]string) ([]string, error) {
-	head, _ := repo.git("rev-parse", "--verify", "-q", "HEAD")
+func mergeHeads(context *octopusContext, remotes map[string]string) ([]string, error) {
+	head, _ := context.repo.git("rev-parse", "--verify", "-q", "HEAD")
 
 	alreadyUpToDate := true
 	for _, sha1 := range remotes {
-		_, err := repo.git("merge-base", "--is-ancestor", sha1, "HEAD")
+		_, err := context.repo.git("merge-base", "--is-ancestor", sha1, "HEAD")
 		if err != nil {
 			alreadyUpToDate = false
 		}
@@ -77,12 +84,12 @@ func mergeHeads(repo *repository, remotes map[string]string) ([]string, error) {
 	}
 
 	mrc := []string{head}
-	mrt, _ := repo.git("write-tree")
+	mrt, _ := context.repo.git("write-tree")
 	nonFfMerge := false
 
 	for prettyRemoteName, sha1 := range remotes {
 
-		common, err := repo.git(append([]string{"merge-base", "--all", sha1}, mrc...)...)
+		common, err := context.repo.git(append([]string{"merge-base", "--all", sha1}, mrc...)...)
 
 		if err != nil {
 			return nil, errors.New("Unable to find common commit with " + prettyRemoteName)
@@ -95,14 +102,14 @@ func mergeHeads(repo *repository, remotes map[string]string) ([]string, error) {
 
 		if len(mrc) == 1 && common == mrc[0] && !nonFfMerge {
 			fmt.Println("Fast-forwarding to: " + prettyRemoteName)
-			_, err := repo.git("read-tree", "-u", "-m", head, sha1)
+			_, err := context.repo.git("read-tree", "-u", "-m", head, sha1)
 
 			if err != nil {
 				return nil, nil
 			}
 
 			mrc[0] = sha1
-			mrt, _ = repo.git("write-tree")
+			mrt, _ = context.repo.git("write-tree")
 			continue
 		}
 
@@ -110,17 +117,17 @@ func mergeHeads(repo *repository, remotes map[string]string) ([]string, error) {
 
 		fmt.Println("Trying simple merge with " + prettyRemoteName)
 
-		_, err = repo.git("read-tree", "-u", "-m", "--aggressive", common, mrt, sha1)
+		_, err = context.repo.git("read-tree", "-u", "-m", "--aggressive", common, mrt, sha1)
 
 		if err != nil {
 			return nil, err
 		}
 
-		next, err := repo.git("write-tree")
+		next, err := context.repo.git("write-tree")
 
 		if err != nil {
 			fmt.Println("Simple merge did not work, trying automatic merge.")
-			_, err = repo.git("merge-index", "-o", "git-merge-one-file", "-a")
+			_, err = context.repo.git("merge-index", "-o", "git-merge-one-file", "-a")
 
 			if err != nil {
 				fmt.Println("Automated merge did not work.")
@@ -128,7 +135,7 @@ func mergeHeads(repo *repository, remotes map[string]string) ([]string, error) {
 				return nil, errors.New("")
 			}
 
-			next, _ = repo.git("write-tree")
+			next, _ = context.repo.git("write-tree")
 		}
 
 		mrc = append(mrc, sha1)
