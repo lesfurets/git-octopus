@@ -3,12 +3,13 @@ package main
 import (
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
+	"lesfurets/git-octopus/git"
+	"lesfurets/git-octopus/run"
+	"lesfurets/git-octopus/test"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
-	"lesfurets/git-octopus/git"
-	"lesfurets/git-octopus/run"
 )
 
 func writeFile(repo *git.Repository, name string, lines ...string) {
@@ -18,7 +19,7 @@ func writeFile(repo *git.Repository, name string, lines ...string) {
 
 func TestVersionShort(t *testing.T) {
 	context, out := run.CreateTestContext()
-	defer run.Cleanup(context)
+	defer test.Cleanup(context.Repo)
 
 	run.Run(context, "-v")
 
@@ -27,7 +28,7 @@ func TestVersionShort(t *testing.T) {
 
 func TestOctopusCommitConfigError(t *testing.T) {
 	context, _ := run.CreateTestContext()
-	defer run.Cleanup(context)
+	defer test.Cleanup(context.Repo)
 
 	context.Repo.Git("config", "octopus.commit", "bad_value")
 
@@ -38,7 +39,7 @@ func TestOctopusCommitConfigError(t *testing.T) {
 
 func TestOctopusNoPatternGiven(t *testing.T) {
 	context, out := run.CreateTestContext()
-	defer run.Cleanup(context)
+	defer test.Cleanup(context.Repo)
 
 	run.Run(context)
 
@@ -47,7 +48,7 @@ func TestOctopusNoPatternGiven(t *testing.T) {
 
 func TestOctopusNoBranchMatching(t *testing.T) {
 	context, out := run.CreateTestContext()
-	defer run.Cleanup(context)
+	defer test.Cleanup(context.Repo)
 
 	run.Run(context, "refs/remotes/dumb/*", "refs/remotes/dumber/*")
 
@@ -56,7 +57,7 @@ func TestOctopusNoBranchMatching(t *testing.T) {
 
 func TestOctopusAlreadyUpToDate(t *testing.T) {
 	context, _ := run.CreateTestContext()
-	defer run.Cleanup(context)
+	defer test.Cleanup(context.Repo)
 
 	writeFile(context.Repo, "foo", "First line")
 	context.Repo.Git("add", "foo")
@@ -74,7 +75,7 @@ func TestOctopusAlreadyUpToDate(t *testing.T) {
 
 func TestOctopus3branches(t *testing.T) {
 	context, _ := run.CreateTestContext()
-	defer run.Cleanup(context)
+	defer test.Cleanup(context.Repo)
 
 	// Create and commit file foo1 in branch1
 	context.Repo.Git("checkout", "-b", "branch1")

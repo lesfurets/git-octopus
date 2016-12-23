@@ -3,49 +3,61 @@ package config
 import (
 	"github.com/stretchr/testify/assert"
 	"testing"
+	"lesfurets/git-octopus/git"
+	"lesfurets/git-octopus/test"
 )
 
+func createTestRepo() *git.Repository {
+	dir := test.CreateTempDir()
+
+	repo := git.Repository{Path: dir}
+
+	repo.Git("init")
+
+	return &repo
+}
+
 func TestDoCommit(t *testing.T) {
-	context, _ := createTestContext()
-	defer cleanup(context)
+	repo := createTestRepo()
+	defer test.Cleanup(repo)
 
 	// GIVEN no config, no option
 	// WHEN
-	octopusConfig, err := GetOctopusConfig(context.repo, nil)
+	octopusConfig, err := GetOctopusConfig(repo, nil)
 
 	// THEN doCommit should be true
 	assert.True(t, octopusConfig.DoCommit)
 	assert.Nil(t, err)
 
 	// GIVEN config to false, no option
-	context.repo.Git("config", "octopus.commit", "false")
+	repo.Git("config", "octopus.commit", "false")
 	// WHEN
-	octopusConfig, err = GetOctopusConfig(context.repo, nil)
+	octopusConfig, err = GetOctopusConfig(repo, nil)
 
 	// THEN doCommit should be false
 	assert.False(t, octopusConfig.DoCommit)
 	assert.Nil(t, err)
 
 	// Config to 0, no option. doCommit should be true
-	context.repo.Git("config", "octopus.commit", "0")
-	octopusConfig, err = GetOctopusConfig(context.repo, nil)
+	repo.Git("config", "octopus.commit", "0")
+	octopusConfig, err = GetOctopusConfig(repo, nil)
 
 	assert.False(t, octopusConfig.DoCommit)
 	assert.Nil(t, err)
 
 	// GIVEN config to false, -c option true
-	context.repo.Git("config", "octopus.commit", "false")
+	repo.Git("config", "octopus.commit", "false")
 	// WHEN
-	octopusConfig, err = GetOctopusConfig(context.repo, []string{"-c"})
+	octopusConfig, err = GetOctopusConfig(repo, []string{"-c"})
 
 	// THEN  doCommit should be true
 	assert.True(t, octopusConfig.DoCommit)
 	assert.Nil(t, err)
 
 	// GIVEN config to true, -n option true
-	context.repo.Git("config", "octopus.commit", "true")
+	repo.Git("config", "octopus.commit", "true")
 	// WHEN
-	octopusConfig, err = GetOctopusConfig(context.repo, []string{"-n"})
+	octopusConfig, err = GetOctopusConfig(repo, []string{"-n"})
 
 	// THEN  doCommit should be false
 	assert.False(t, octopusConfig.DoCommit)
@@ -53,12 +65,12 @@ func TestDoCommit(t *testing.T) {
 }
 
 func TestChunkMode(t *testing.T) {
-	context, _ := createTestContext()
-	defer cleanup(context)
+	repo := createTestRepo()
+	defer test.Cleanup(repo)
 
 	// GIVEN No option
 	// WHEN
-	octopusConfig, err := GetOctopusConfig(context.repo, nil)
+	octopusConfig, err := GetOctopusConfig(repo, nil)
 
 	// THEN chunkSize should be 0
 	assert.Equal(t, 0, octopusConfig.ChunkSize)
@@ -66,7 +78,7 @@ func TestChunkMode(t *testing.T) {
 
 	// GIVEN option -s 5
 	// WHEN
-	octopusConfig, err = GetOctopusConfig(context.repo, []string{"-s", "5"})
+	octopusConfig, err = GetOctopusConfig(repo, []string{"-s", "5"})
 
 	// THEN chunkSize should be 5
 	assert.Equal(t, 5, octopusConfig.ChunkSize)
@@ -74,22 +86,22 @@ func TestChunkMode(t *testing.T) {
 }
 
 func TestExcludedPatterns(t *testing.T) {
-	context, _ := createTestContext()
-	defer cleanup(context)
+	repo := createTestRepo()
+	defer test.Cleanup(repo)
 
 	// GIVEN no config, no option
 	// WHEN
-	octopusConfig, err := GetOctopusConfig(context.repo, nil)
+	octopusConfig, err := GetOctopusConfig(repo, nil)
 
 	// THEN excludedPatterns should be empty
 	assert.Empty(t, octopusConfig.ExcludedPatterns)
 	assert.Nil(t, err)
 
 	// GIVEN excludePattern config, no option
-	context.repo.Git("config", "octopus.excludePattern", "excluded/*")
-	context.repo.Git("config", "--add", "octopus.excludePattern", "excluded_branch")
+	repo.Git("config", "octopus.excludePattern", "excluded/*")
+	repo.Git("config", "--add", "octopus.excludePattern", "excluded_branch")
 	// WHEN
-	octopusConfig, err = GetOctopusConfig(context.repo, nil)
+	octopusConfig, err = GetOctopusConfig(repo, nil)
 
 	// THEN excludedPatterns should be set
 	assert.Equal(t, []string{"excluded/*", "excluded_branch"}, octopusConfig.ExcludedPatterns)
@@ -97,7 +109,7 @@ func TestExcludedPatterns(t *testing.T) {
 
 	// GIVEN excludePattern config (from previous assertion), option given
 	// WHEN
-	octopusConfig, err = GetOctopusConfig(context.repo, []string{"-e", "override_excluded"})
+	octopusConfig, err = GetOctopusConfig(repo, []string{"-e", "override_excluded"})
 
 	// THEN option should take precedence
 	assert.Equal(t, []string{"override_excluded"}, octopusConfig.ExcludedPatterns)
@@ -105,22 +117,22 @@ func TestExcludedPatterns(t *testing.T) {
 }
 
 func TestPatterns(t *testing.T) {
-	context, _ := createTestContext()
-	defer cleanup(context)
+	repo := createTestRepo()
+	defer test.Cleanup(repo)
 
 	// GIVEN no config, no option
 	// WHEN
-	octopusConfig, err := GetOctopusConfig(context.repo, nil)
+	octopusConfig, err := GetOctopusConfig(repo, nil)
 
 	// THEN excludedPatterns should be empty
 	assert.Empty(t, octopusConfig.Patterns)
 	assert.Nil(t, err)
 
 	// GIVEN config, no argument.
-	context.repo.Git("config", "octopus.pattern", "test")
-	context.repo.Git("config", "--add", "octopus.pattern", "test2")
+	repo.Git("config", "octopus.pattern", "test")
+	repo.Git("config", "--add", "octopus.pattern", "test2")
 	// WHEN
-	octopusConfig, err = GetOctopusConfig(context.repo, nil)
+	octopusConfig, err = GetOctopusConfig(repo, nil)
 
 	// THEN patterns should be set
 	assert.Equal(t, []string{"test", "test2"}, octopusConfig.Patterns)
@@ -128,7 +140,7 @@ func TestPatterns(t *testing.T) {
 
 	// GIVEN config (from previous assertion), argument given
 	// WHEN
-	octopusConfig, err = GetOctopusConfig(context.repo, []string{"arg1", "arg2"})
+	octopusConfig, err = GetOctopusConfig(repo, []string{"arg1", "arg2"})
 
 	// THEN arguments should take precedence
 	assert.Equal(t, []string{"arg1", "arg2"}, octopusConfig.Patterns)

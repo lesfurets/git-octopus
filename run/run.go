@@ -7,8 +7,7 @@ import (
 	"lesfurets/git-octopus/config"
 	"strings"
 	"bytes"
-	"io/ioutil"
-	"os"
+	"lesfurets/git-octopus/test"
 )
 
 type OctopusContext struct {
@@ -142,7 +141,7 @@ func octopusCommitMessage(remotes map[string]string) string {
 
 
 func CreateTestContext() (*OctopusContext, *bytes.Buffer) {
-	dir, _ := ioutil.TempDir("", "git-octopus-test-")
+	dir := test.CreateTempDir()
 
 	repo := git.Repository{Path: dir}
 
@@ -157,8 +156,4 @@ func CreateTestContext() (*OctopusContext, *bytes.Buffer) {
 	}
 
 	return &context, out
-}
-
-func Cleanup(context *OctopusContext) error {
-	return os.RemoveAll(context.Repo.Path)
 }
