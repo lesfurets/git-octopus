@@ -5,15 +5,16 @@ import (
 	"log"
 	"os"
 	"strings"
+	"lesfurets/git-octopus/git"
 )
 
 type octopusContext struct {
-	repo   *repository
+	repo   *git.Repository
 	logger *log.Logger
 }
 
 func main() {
-	repo := repository{path: "."}
+	repo := git.Repository{Path: "."}
 
 	context := octopusContext{
 		repo:   &repo,
@@ -60,9 +61,9 @@ func run(context *octopusContext, args ...string) error {
 	}
 
 	if octopusConfig.doCommit {
-		tree, _ := context.repo.git("write-tree")
-		commit, _ := context.repo.git("commit-tree", "-p", strings.Join(parents, " -p "), "-m", octopusCommitMessage(branchList), tree)
-		context.repo.git("update-ref", "HEAD", commit)
+		tree, _ := context.repo.Git("write-tree")
+		commit, _ := context.repo.Git("commit-tree", "-p", strings.Join(parents, " -p "), "-m", octopusCommitMessage(branchList), tree)
+		context.repo.Git("update-ref", "HEAD", commit)
 	}
 
 	return nil
@@ -70,11 +71,11 @@ func run(context *octopusContext, args ...string) error {
 
 // The logic of this function is copied directly from git-merge-octopus.sh
 func mergeHeads(context *octopusContext, remotes map[string]string) ([]string, error) {
-	head, _ := context.repo.git("rev-parse", "--verify", "-q", "HEAD")
+	head, _ := context.repo.Git("rev-parse", "--verify", "-q", "HEAD")
 
 	alreadyUpToDate := true
 	for _, sha1 := range remotes {
-		_, err := context.repo.git("merge-base", "--is-ancestor", sha1, "HEAD")
+		_, err := context.repo.Git("merge-base", "--is-ancestor", sha1, "HEAD")
 		if err != nil {
 			alreadyUpToDate = false
 		}
@@ -87,12 +88,12 @@ func mergeHeads(context *octopusContext, remotes map[string]string) ([]string, e
 	}
 
 	mrc := []string{head}
-	mrt, _ := context.repo.git("write-tree")
+	mrt, _ := context.repo.Git("write-tree")
 	nonFfMerge := false
 
 	for prettyRemoteName, sha1 := range remotes {
 
-		common, err := context.repo.git(append([]string{"merge-base", "--all", sha1}, mrc...)...)
+		common, err := context.repo.Git(append([]string{"merge-base", "--all", sha1}, mrc...)...)
 
 		if err != nil {
 			return nil, errors.New("Unable to find common commit with " + prettyRemoteName)
@@ -105,14 +106,14 @@ func mergeHeads(context *octopusContext, remotes map[string]string) ([]string, e
 
 		if len(mrc) == 1 && common == mrc[0] && !nonFfMerge {
 			context.logger.Println("Fast-forwarding to: " + prettyRemoteName)
-			_, err := context.repo.git("read-tree", "-u", "-m", head, sha1)
+			_, err := context.repo.Git("read-tree", "-u", "-m", head, sha1)
 
 			if err != nil {
 				return nil, nil
 			}
 
 			mrc[0] = sha1
-			mrt, _ = context.repo.git("write-tree")
+			mrt, _ = context.repo.Git("write-tree")
 			continue
 		}
 
@@ -120,17 +121,17 @@ func mergeHeads(context *octopusContext, remotes map[string]string) ([]string, e
 
 		context.logger.Println("Trying simple merge with " + prettyRemoteName)
 
-		_, err = context.repo.git("read-tree", "-u", "-m", "--aggressive", common, mrt, sha1)
+		_, err = context.repo.Git("read-tree", "-u", "-m", "--aggressive", common, mrt, sha1)
 
 		if err != nil {
 			return nil, err
 		}
 
-		next, err := context.repo.git("write-tree")
+		next, err := context.repo.Git("write-tree")
 
 		if err != nil {
 			context.logger.Println("Simple merge did not work, trying automatic merge.")
-			_, err = context.repo.git("merge-index", "-o", "git-merge-one-file", "-a")
+			_, err = context.repo.Git("merge-index", "-o", "git-merge-one-file", "-a")
 
 			if err != nil {
 				context.logger.Println("Automated merge did not work.")
@@ -138,7 +139,7 @@ func mergeHeads(context *octopusContext, remotes map[string]string) ([]string, e
 				return nil, errors.New("")
 			}
 
-			next, _ = context.repo.git("write-tree")
+			next, _ = context.repo.Git("write-tree")
 		}
 
 		mrc = append(mrc, sha1)

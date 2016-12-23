@@ -18,7 +18,7 @@ func TestDoCommit(t *testing.T) {
 	assert.Nil(t, err)
 
 	// GIVEN config to false, no option
-	context.repo.git("config", "octopus.commit", "false")
+	context.repo.Git("config", "octopus.commit", "false")
 	// WHEN
 	octopusConfig, err = getOctopusConfig(context.repo, nil)
 
@@ -27,14 +27,14 @@ func TestDoCommit(t *testing.T) {
 	assert.Nil(t, err)
 
 	// Config to 0, no option. doCommit should be true
-	context.repo.git("config", "octopus.commit", "0")
+	context.repo.Git("config", "octopus.commit", "0")
 	octopusConfig, err = getOctopusConfig(context.repo, nil)
 
 	assert.False(t, octopusConfig.doCommit)
 	assert.Nil(t, err)
 
 	// GIVEN config to false, -c option true
-	context.repo.git("config", "octopus.commit", "false")
+	context.repo.Git("config", "octopus.commit", "false")
 	// WHEN
 	octopusConfig, err = getOctopusConfig(context.repo, []string{"-c"})
 
@@ -43,7 +43,7 @@ func TestDoCommit(t *testing.T) {
 	assert.Nil(t, err)
 
 	// GIVEN config to true, -n option true
-	context.repo.git("config", "octopus.commit", "true")
+	context.repo.Git("config", "octopus.commit", "true")
 	// WHEN
 	octopusConfig, err = getOctopusConfig(context.repo, []string{"-n"})
 
@@ -86,8 +86,8 @@ func TestExcludedPatterns(t *testing.T) {
 	assert.Nil(t, err)
 
 	// GIVEN excludePattern config, no option
-	context.repo.git("config", "octopus.excludePattern", "excluded/*")
-	context.repo.git("config", "--add", "octopus.excludePattern", "excluded_branch")
+	context.repo.Git("config", "octopus.excludePattern", "excluded/*")
+	context.repo.Git("config", "--add", "octopus.excludePattern", "excluded_branch")
 	// WHEN
 	octopusConfig, err = getOctopusConfig(context.repo, nil)
 
@@ -117,8 +117,8 @@ func TestPatterns(t *testing.T) {
 	assert.Nil(t, err)
 
 	// GIVEN config, no argument.
-	context.repo.git("config", "octopus.pattern", "test")
-	context.repo.git("config", "--add", "octopus.pattern", "test2")
+	context.repo.Git("config", "octopus.pattern", "test")
+	context.repo.Git("config", "--add", "octopus.pattern", "test2")
 	// WHEN
 	octopusConfig, err = getOctopusConfig(context.repo, nil)
 
