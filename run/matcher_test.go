@@ -3,10 +3,11 @@ package run
 import (
 	"github.com/stretchr/testify/assert"
 	"testing"
+	"lesfurets/git-octopus/test"
 )
 
 func setupRepo() *OctopusContext {
-	context, _ := createTestContext()
+	context, _ := CreateTestContext()
 	head, _ := context.Repo.Git("rev-parse", "HEAD")
 	context.Repo.Git("update-ref", "refs/heads/test1", head)
 	context.Repo.Git("update-ref", "refs/remotes/origin/test1", head)
@@ -17,7 +18,7 @@ func setupRepo() *OctopusContext {
 
 func TestResolveBranchListSimple(t *testing.T) {
 	context := setupRepo()
-	defer cleanup(context)
+	defer test.Cleanup(context.Repo)
 
 	head, _ := context.Repo.Git("rev-parse", "HEAD")
 
@@ -33,7 +34,7 @@ func TestResolveBranchListSimple(t *testing.T) {
 
 func TestResolveBranchListExclusion(t *testing.T) {
 	context := setupRepo()
-	defer cleanup(context)
+	defer test.Cleanup(context.Repo)
 
 	head, _ := context.Repo.Git("rev-parse", "HEAD")
 

@@ -1,10 +1,10 @@
 package main
 
 import (
-	"log"
-	"os"
 	"lesfurets/git-octopus/git"
 	"lesfurets/git-octopus/run"
+	"log"
+	"os"
 )
 
 func main() {
@@ -22,4 +22,3 @@ func main() {
 		os.Exit(1)
 	}
 }
-
