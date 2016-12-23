@@ -1,15 +1,17 @@
 package main
 
-func resolveBranchList(repo *repository, patterns []string, excludedPatterns []string) map[string]string {
-	lsRemote, _ := repo.git(append([]string{"ls-remote", "."}, patterns...)...)
-	result := parseLsRemote(lsRemote)
+import "lesfurets/git-octopus/git"
+
+func resolveBranchList(repo *git.Repository, patterns []string, excludedPatterns []string) map[string]string {
+	lsRemote, _ := repo.Git(append([]string{"ls-remote", "."}, patterns...)...)
+	result := git.ParseLsRemote(lsRemote)
 
 	if len(excludedPatterns) == 0 {
 		return result
 	}
 
-	lsRemote, _ = repo.git(append([]string{"ls-remote", "."}, excludedPatterns...)...)
-	excludedRefs := parseLsRemote(lsRemote)
+	lsRemote, _ = repo.Git(append([]string{"ls-remote", "."}, excludedPatterns...)...)
+	excludedRefs := git.ParseLsRemote(lsRemote)
 	for excludedRef := range excludedRefs {
 		delete(result, excludedRef)
 	}
