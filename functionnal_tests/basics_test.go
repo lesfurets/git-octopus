@@ -1,58 +1,20 @@
-package main
+package functionnal_tests
 
 import (
-	"github.com/stretchr/testify/assert"
-	"io/ioutil"
-	"lesfurets/git-octopus/git"
+	"testing"
 	"lesfurets/git-octopus/run"
-	"lesfurets/git-octopus/test"
+	"github.com/stretchr/testify/assert"
 	"os"
 	"path/filepath"
+	"io/ioutil"
 	"strings"
-	"testing"
+	"lesfurets/git-octopus/git"
+	"lesfurets/git-octopus/test"
 )
 
 func writeFile(repo *git.Repository, name string, lines ...string) {
 	fileName := filepath.Join(repo.Path, name)
 	ioutil.WriteFile(fileName, []byte(strings.Join(lines, "\n")), 0644)
-}
-
-func TestVersionShort(t *testing.T) {
-	context, out := run.CreateTestContext()
-	defer test.Cleanup(context.Repo)
-
-	run.Run(context, "-v")
-
-	assert.Equal(t, "2.0\n", out.String())
-}
-
-func TestOctopusCommitConfigError(t *testing.T) {
-	context, _ := run.CreateTestContext()
-	defer test.Cleanup(context.Repo)
-
-	context.Repo.Git("config", "octopus.commit", "bad_value")
-
-	err := run.Run(context, "-v")
-
-	assert.NotNil(t, err)
-}
-
-func TestOctopusNoPatternGiven(t *testing.T) {
-	context, out := run.CreateTestContext()
-	defer test.Cleanup(context.Repo)
-
-	run.Run(context)
-
-	assert.Equal(t, "Nothing to merge. No pattern given\n", out.String())
-}
-
-func TestOctopusNoBranchMatching(t *testing.T) {
-	context, out := run.CreateTestContext()
-	defer test.Cleanup(context.Repo)
-
-	run.Run(context, "refs/remotes/dumb/*", "refs/remotes/dumber/*")
-
-	assert.Equal(t, "No branch matching \"refs/remotes/dumb/* refs/remotes/dumber/*\" were found\n", out.String())
 }
 
 func TestOctopusAlreadyUpToDate(t *testing.T) {
