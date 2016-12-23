@@ -1,4 +1,4 @@
-package main
+package config
 
 import (
 	"errors"
@@ -8,12 +8,12 @@ import (
 	"lesfurets/git-octopus/git"
 )
 
-type octopusConfig struct {
-	printVersion     bool
-	doCommit         bool
-	chunkSize        int
-	excludedPatterns []string
-	patterns         []string
+type OctopusConfig struct {
+	PrintVersion     bool
+	DoCommit         bool
+	ChunkSize        int
+	ExcludedPatterns []string
+	Patterns         []string
 }
 
 type excluded_patterns []string
@@ -27,7 +27,7 @@ func (e *excluded_patterns) Set(value string) error {
 	return nil
 }
 
-func getOctopusConfig(repo *git.Repository, args []string) (*octopusConfig, error) {
+func GetOctopusConfig(repo *git.Repository, args []string) (*OctopusConfig, error) {
 
 	var printVersion, noCommitArg, commitArg bool
 	var chunkSizeArg int
@@ -87,11 +87,11 @@ func getOctopusConfig(repo *git.Repository, args []string) (*octopusConfig, erro
 		patterns = commandLine.Args()
 	}
 
-	return &octopusConfig{
-		printVersion:     printVersion,
-		doCommit:         configCommit,
-		chunkSize:        chunkSizeArg,
-		excludedPatterns: excludedPatterns,
-		patterns:         patterns,
+	return &OctopusConfig{
+		PrintVersion:     printVersion,
+		DoCommit:         configCommit,
+		ChunkSize:        chunkSizeArg,
+		ExcludedPatterns: excludedPatterns,
+		Patterns:         patterns,
 	}, nil
 }
