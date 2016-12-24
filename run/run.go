@@ -40,7 +40,13 @@ func Run(context *OctopusContext, args ...string) error {
 		return nil
 	}
 
+	initialHeadCommit, _ := context.Repo.Git("rev-parse", "HEAD")
+
 	parents, err := mergeHeads(context, branchList)
+
+	if !octopusConfig.DoCommit {
+		context.Repo.Git("reset", "-q", "--hard", initialHeadCommit)
+	}
 
 	if err != nil {
 		return err

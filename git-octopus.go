@@ -18,7 +18,9 @@ func main() {
 	err := run.Run(&context, os.Args[1:]...)
 
 	if err != nil {
-		log.Fatalln(err.Error())
+		if len(err.Error()) > 0 {
+			log.Fatalln(err.Error())
+		}
 		os.Exit(1)
 	}
 }
