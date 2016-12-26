@@ -7,15 +7,6 @@ import (
 	"lesfurets/git-octopus/test"
 )
 
-func TestVersionShort(t *testing.T) {
-	context, out := run.CreateTestContext()
-	defer test.Cleanup(context.Repo)
-
-	run.Run(context, "-v")
-
-	assert.Equal(t, "2.0\n", out.String())
-}
-
 func TestOctopusCommitConfigError(t *testing.T) {
 	context, _ := run.CreateTestContext()
 	defer test.Cleanup(context.Repo)

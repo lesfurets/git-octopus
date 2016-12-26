@@ -12,6 +12,15 @@ import (
 	"lesfurets/git-octopus/test"
 )
 
+func TestVersion(t *testing.T) {
+	context, out := run.CreateTestContext()
+	defer test.Cleanup(context.Repo)
+
+	run.Run(context, "-v")
+
+	assert.Equal(t, "2.0\n", out.String())
+}
+
 func writeFile(repo *git.Repository, name string, lines ...string) {
 	fileName := filepath.Join(repo.Path, name)
 	ioutil.WriteFile(fileName, []byte(strings.Join(lines, "\n")), 0644)
