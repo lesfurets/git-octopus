@@ -52,9 +52,15 @@ func Run(context *OctopusContext, args ...string) error {
 		return err
 	}
 
-	if octopusConfig.DoCommit {
+	// parents always contains HEAD. We need at lease 2 parents to create a merge commit
+	if octopusConfig.DoCommit && parents != nil && len(parents) > 1 {
 		tree, _ := context.Repo.Git("write-tree")
-		commit, _ := context.Repo.Git("commit-tree", "-p", strings.Join(parents, " -p "), "-m", octopusCommitMessage(branchList), tree)
+		args := []string {"commit-tree"}
+		for _, parent := range parents {
+			args = append(args, "-p", parent)
+		}
+		args = append(args, "-m", octopusCommitMessage(branchList), tree)
+		commit, _ := context.Repo.Git(args...)
 		context.Repo.Git("update-ref", "HEAD", commit)
 	}
 
@@ -64,20 +70,6 @@ func Run(context *OctopusContext, args ...string) error {
 // The logic of this function is copied directly from git-merge-octopus.sh
 func mergeHeads(context *OctopusContext, remotes map[string]string) ([]string, error) {
 	head, _ := context.Repo.Git("rev-parse", "--verify", "-q", "HEAD")
-
-	alreadyUpToDate := true
-	for _, sha1 := range remotes {
-		_, err := context.Repo.Git("merge-base", "--is-ancestor", sha1, "HEAD")
-		if err != nil {
-			alreadyUpToDate = false
-		}
-	}
-	// This prevents git-octopus to create a commit when there's nothing to merge,
-	// i.e. no feature branches but only master.
-	if alreadyUpToDate {
-		context.Logger.Println("Already up to date")
-		return nil, nil
-	}
 
 	mrc := []string{head}
 	mrt, _ := context.Repo.Git("write-tree")
