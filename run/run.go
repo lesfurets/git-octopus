@@ -40,6 +40,13 @@ func Run(context *OctopusContext, args ...string) error {
 		return nil
 	}
 
+	status, _ := context.Repo.Git("status", "--porcelain")
+
+	// This is not formally required but it would be an ambiguous behaviour to let git-octopus run on unclean state.
+	if len(status) != 0 {
+		return errors.New("The repository has to be clean.")
+	}
+
 	initialHeadCommit, _ := context.Repo.Git("rev-parse", "HEAD")
 
 	parents, err := mergeHeads(context, branchList)

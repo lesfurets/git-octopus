@@ -65,3 +65,18 @@ func TestOctopusAlreadyUpToDate(t *testing.T) {
 
 	assert.Contains(t, out.String(), "Already up-to-date with refs/heads/outdated_branch")
 }
+
+// git-octopus should prevent from running if status is not clean
+func TestUncleanStateFail(t *testing.T) {
+	context, _ := run.CreateTestContext()
+	defer test.Cleanup(context.Repo)
+
+	// create and commit a file
+	writeFile(context.Repo, "foo", "First line")
+
+	err := run.Run(context, "*")
+
+	if (assert.NotNil(t, err)) {
+		assert.Contains(t, err.Error(), "The repository has to be clean.")
+	}
+}
