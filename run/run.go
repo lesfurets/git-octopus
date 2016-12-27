@@ -7,7 +7,6 @@ import (
 	"github.com/lesfurets/git-octopus/git"
 	"github.com/lesfurets/git-octopus/test"
 	"log"
-	"strings"
 )
 
 type OctopusContext struct {
@@ -33,13 +32,6 @@ func Run(context *OctopusContext, args ...string) error {
 		return nil
 	}
 
-	branchList := resolveBranchList(context.Repo, octopusConfig.Patterns, octopusConfig.ExcludedPatterns)
-
-	if len(branchList) == 0 {
-		context.Logger.Printf("No branch matching \"%v\" were found\n", strings.Join(octopusConfig.Patterns, " "))
-		return nil
-	}
-
 	status, _ := context.Repo.Git("status", "--porcelain")
 
 	// This is not formally required but it would be an ambiguous behaviour to let git-octopus run on unclean state.
@@ -47,7 +39,15 @@ func Run(context *OctopusContext, args ...string) error {
 		return errors.New("The repository has to be clean.")
 	}
 
+	branchList := resolveBranchList(context.Repo, context.Logger, octopusConfig.Patterns, octopusConfig.ExcludedPatterns)
+
+	if len(branchList) == 0 {
+		return nil
+	}
+
 	initialHeadCommit, _ := context.Repo.Git("rev-parse", "HEAD")
+
+	context.Logger.Println()
 
 	parents, err := mergeHeads(context, branchList)
 
