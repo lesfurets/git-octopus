@@ -33,7 +33,7 @@ func TestOctopusNoBranchMatching(t *testing.T) {
 
 	run.Run(context, "refs/remotes/dumb/*", "refs/remotes/dumber/*")
 
-	assert.Equal(t, "No branch matching \"refs/remotes/dumb/* refs/remotes/dumber/*\" were found\n", out.String())
+	assert.Contains(t, out.String(), "No branch matching \"refs/remotes/dumb/* refs/remotes/dumber/*\" were found\n")
 }
 
 // Merge a branch that is already merged.

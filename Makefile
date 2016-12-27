@@ -16,7 +16,7 @@ install_docs = cp -f doc/$(1).1 $(man1dir)/$(1).1 \
 	&& cp -f doc/$(1).html $(htmldir)
 
 fmt:
-	gofmt -w *.go
+	gofmt -w **/*.go
 
 build:
 	@mkdir -p bin
