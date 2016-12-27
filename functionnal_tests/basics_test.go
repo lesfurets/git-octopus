@@ -74,4 +74,14 @@ func TestOctopus3branches(t *testing.T) {
 	assert.Nil(t, err)
 	_, err = repo.Git("merge-base", "--is-ancestor", "branch3", "octopus")
 	assert.Nil(t, err)
+
+	// Assert the commit message
+	commitMessage, _ := repo.Git("show", "--pretty=format:%B") // gets the commit body only
+
+	assert.Contains(t, commitMessage,
+		"Merged branches:\n"+
+			"refs/heads/branch1\n"+
+			"refs/heads/branch2\n"+
+			"refs/heads/branch3\n"+
+			"\nCommit created by git-octopus "+run.VERSION+".")
 }

@@ -14,6 +14,8 @@ type OctopusContext struct {
 	Logger *log.Logger
 }
 
+const VERSION = "2.0"
+
 func Run(context *OctopusContext, args ...string) error {
 
 	octopusConfig, err := config.GetOctopusConfig(context.Repo, args)
@@ -23,7 +25,7 @@ func Run(context *OctopusContext, args ...string) error {
 	}
 
 	if octopusConfig.PrintVersion {
-		context.Logger.Println("2.0")
+		context.Logger.Println(VERSION)
 		return nil
 	}
 
@@ -141,7 +143,12 @@ func mergeHeads(context *OctopusContext, remotes map[string]string) ([]string, e
 }
 
 func octopusCommitMessage(remotes map[string]string) string {
-	return "octopus commit"
+	buf := bytes.NewBufferString("Merged branches:\n")
+	for ref, _ := range remotes {
+		buf.WriteString(ref + "\n")
+	}
+	buf.WriteString("\nCommit created by git-octopus " + VERSION + ".\n")
+	return buf.String()
 }
 
 func CreateTestContext() (*OctopusContext, *bytes.Buffer) {
