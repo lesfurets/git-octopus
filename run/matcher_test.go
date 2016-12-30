@@ -2,6 +2,7 @@ package run
 
 import (
 	"bytes"
+	"github.com/lesfurets/git-octopus/git"
 	"github.com/lesfurets/git-octopus/test"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -26,9 +27,9 @@ func TestResolveBranchListSimple(t *testing.T) {
 
 	branchList := resolveBranchList(context.Repo, context.Logger, []string{"refs/heads/*"}, nil)
 
-	expected := map[string]string{
-		"refs/heads/master": head,
-		"refs/heads/test1":  head,
+	expected := []git.LsRemoteEntry{
+		{Ref: "refs/heads/master", Sha1: head},
+		{Ref: "refs/heads/test1", Sha1: head},
 	}
 
 	assert.Equal(t, expected, branchList)
@@ -47,10 +48,10 @@ func TestResolveBranchListExclusion(t *testing.T) {
 
 	branchList := resolveBranchList(context.Repo, context.Logger, []string{"refs/heads/*", "remotes/origin/*"}, []string{"*/test1"})
 
-	expected := map[string]string{
-		"refs/heads/master":         head,
-		"refs/remotes/origin/test2": head,
-		"refs/remotes/origin/test3": head,
+	expected := []git.LsRemoteEntry{
+		{Ref: "refs/heads/master", Sha1: head},
+		{Ref: "refs/remotes/origin/test2", Sha1: head},
+		{Ref: "refs/remotes/origin/test3", Sha1: head},
 	}
 
 	assert.Equal(t, expected, branchList)
