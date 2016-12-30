@@ -1,9 +1,9 @@
 package run
 
 import (
+	"github.com/lesfurets/git-octopus/test"
 	"github.com/stretchr/testify/assert"
 	"testing"
-	"github.com/lesfurets/git-octopus/test"
 )
 
 func setupRepo() *OctopusContext {

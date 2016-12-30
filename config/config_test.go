@@ -1,10 +1,10 @@
 package config
 
 import (
-	"github.com/stretchr/testify/assert"
-	"testing"
 	"github.com/lesfurets/git-octopus/git"
 	"github.com/lesfurets/git-octopus/test"
+	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 func createTestRepo() *git.Repository {
