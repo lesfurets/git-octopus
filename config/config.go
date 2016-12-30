@@ -5,7 +5,7 @@ import (
 	"flag"
 	"strconv"
 	"strings"
-	"lesfurets/git-octopus/git"
+	"github.com/lesfurets/git-octopus/git"
 )
 
 type OctopusConfig struct {

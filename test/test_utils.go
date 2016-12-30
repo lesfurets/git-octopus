@@ -2,7 +2,7 @@ package test
 
 import (
 	"io/ioutil"
-	"lesfurets/git-octopus/git"
+	"github.com/lesfurets/git-octopus/git"
 	"os"
 )
 
