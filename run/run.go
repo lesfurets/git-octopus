@@ -1,13 +1,13 @@
 package run
 
 import (
-	"lesfurets/git-octopus/git"
+	"github.com/lesfurets/git-octopus/git"
 	"log"
 	"errors"
-	"lesfurets/git-octopus/config"
+	"github.com/lesfurets/git-octopus/config"
 	"strings"
 	"bytes"
-	"lesfurets/git-octopus/test"
+	"github.com/lesfurets/git-octopus/test"
 )
 
 type OctopusContext struct {

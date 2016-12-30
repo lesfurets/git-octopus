@@ -1,6 +1,6 @@
 package run
 
-import "lesfurets/git-octopus/git"
+import "github.com/lesfurets/git-octopus/git"
 
 func resolveBranchList(repo *git.Repository, patterns []string, excludedPatterns []string) map[string]string {
 	lsRemote, _ := repo.Git(append([]string{"ls-remote", "."}, patterns...)...)

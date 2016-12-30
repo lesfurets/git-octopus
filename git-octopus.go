@@ -1,8 +1,8 @@
 package main
 
 import (
-	"lesfurets/git-octopus/git"
-	"lesfurets/git-octopus/run"
+	"github.com/lesfurets/git-octopus/git"
+	"github.com/lesfurets/git-octopus/run"
 	"log"
 	"os"
 )

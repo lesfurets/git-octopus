@@ -2,9 +2,9 @@ package functionnal_tests
 
 import (
 	"testing"
-	"lesfurets/git-octopus/run"
+	"github.com/lesfurets/git-octopus/run"
 	"github.com/stretchr/testify/assert"
-	"lesfurets/git-octopus/test"
+	"github.com/lesfurets/git-octopus/test"
 )
 
 func TestOctopusCommitConfigError(t *testing.T) {
