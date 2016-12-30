@@ -6,9 +6,14 @@ import (
 	"strings"
 )
 
+type LsRemoteEntry struct {
+	Ref  string
+	Sha1 string
+}
+
 // Takes the output of git-ls-remote. Returns a map refsname => sha1
-func ParseLsRemote(lsRemoteOutput string) map[string]string {
-	result := map[string]string{}
+func ParseLsRemote(lsRemoteOutput string) []LsRemoteEntry {
+	result := []LsRemoteEntry{}
 
 	if len(lsRemoteOutput) == 0 {
 		return result
@@ -18,8 +23,7 @@ func ParseLsRemote(lsRemoteOutput string) map[string]string {
 
 	for scanner.Scan() {
 		split := strings.Split(scanner.Text(), "\t")
-
-		result[split[1]] = split[0]
+		result = append(result, LsRemoteEntry{Ref: split[1], Sha1: split[0]})
 	}
 
 	return result

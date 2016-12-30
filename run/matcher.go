@@ -8,12 +8,12 @@ import (
 	"strings"
 )
 
-func resolveBranchList(repo *git.Repository, logger *log.Logger, patterns []string, excludedPatterns []string) map[string]string {
+func resolveBranchList(repo *git.Repository, logger *log.Logger, patterns []string, excludedPatterns []string) []git.LsRemoteEntry {
 	lsRemote, _ := repo.Git(append([]string{"ls-remote", "."}, patterns...)...)
-	result := git.ParseLsRemote(lsRemote)
-	excludedRefs := map[string]string{}
+	includedRefs := git.ParseLsRemote(lsRemote)
+	excludedRefs := []git.LsRemoteEntry{}
 
-	totalCount := len(result)
+	totalCount := len(includedRefs)
 	excludedCount := 0
 
 	if len(excludedPatterns) > 0 {
@@ -27,16 +27,25 @@ func resolveBranchList(repo *git.Repository, logger *log.Logger, patterns []stri
 		tempBuffer.WriteString(fmt.Sprintf("No branch matching \"%v\" were found\n", strings.Join(patterns, " ")))
 	}
 
-	for ref, _ := range result {
-		_, ok := excludedRefs[ref]
-		if ok {
-			delete(result, ref)
-			excludedCount++
+	result := []git.LsRemoteEntry{}
+
+	for _, lsRemoteEntry := range includedRefs {
+		excluded := false
+		for _, excl := range excludedRefs {
+			if excl.Ref == lsRemoteEntry.Ref {
+				excludedCount++
+				excluded = true
+				break
+			}
+		}
+
+		if excluded {
 			tempBuffer.WriteString("E  ")
 		} else {
 			tempBuffer.WriteString("I  ")
+			result = append(result, lsRemoteEntry)
 		}
-		tempBuffer.WriteString(ref + "\n")
+		tempBuffer.WriteString(lsRemoteEntry.Ref + "\n")
 	}
 
 	count := len(result)
