@@ -1,8 +1,8 @@
 package test
 
 import (
-	"io/ioutil"
 	"github.com/lesfurets/git-octopus/git"
+	"io/ioutil"
 	"os"
 )
 

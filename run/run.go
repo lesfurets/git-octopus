@@ -1,13 +1,13 @@
 package run
 
 import (
-	"github.com/lesfurets/git-octopus/git"
-	"log"
+	"bytes"
 	"errors"
 	"github.com/lesfurets/git-octopus/config"
-	"strings"
-	"bytes"
+	"github.com/lesfurets/git-octopus/git"
 	"github.com/lesfurets/git-octopus/test"
+	"log"
+	"strings"
 )
 
 type OctopusContext struct {
@@ -62,7 +62,7 @@ func Run(context *OctopusContext, args ...string) error {
 	// parents always contains HEAD. We need at lease 2 parents to create a merge commit
 	if octopusConfig.DoCommit && parents != nil && len(parents) > 1 {
 		tree, _ := context.Repo.Git("write-tree")
-		args := []string {"commit-tree"}
+		args := []string{"commit-tree"}
 		for _, parent := range parents {
 			args = append(args, "-p", parent)
 		}
@@ -143,7 +143,6 @@ func mergeHeads(context *OctopusContext, remotes map[string]string) ([]string, e
 func octopusCommitMessage(remotes map[string]string) string {
 	return "octopus commit"
 }
-
 
 func CreateTestContext() (*OctopusContext, *bytes.Buffer) {
 	dir := test.CreateTempDir()

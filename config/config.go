@@ -3,9 +3,9 @@ package config
 import (
 	"errors"
 	"flag"
+	"github.com/lesfurets/git-octopus/git"
 	"strconv"
 	"strings"
-	"github.com/lesfurets/git-octopus/git"
 )
 
 type OctopusConfig struct {

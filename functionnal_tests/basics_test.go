@@ -1,15 +1,15 @@
 package functionnal_tests
 
 import (
-	"testing"
+	"github.com/lesfurets/git-octopus/git"
 	"github.com/lesfurets/git-octopus/run"
+	"github.com/lesfurets/git-octopus/test"
 	"github.com/stretchr/testify/assert"
+	"io/ioutil"
 	"os"
 	"path/filepath"
-	"io/ioutil"
 	"strings"
-	"github.com/lesfurets/git-octopus/git"
-	"github.com/lesfurets/git-octopus/test"
+	"testing"
 )
 
 func TestVersion(t *testing.T) {

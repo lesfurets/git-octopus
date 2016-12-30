@@ -1,10 +1,10 @@
 package functionnal_tests
 
 import (
-	"testing"
 	"github.com/lesfurets/git-octopus/run"
-	"github.com/stretchr/testify/assert"
 	"github.com/lesfurets/git-octopus/test"
+	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 func TestOctopusCommitConfigError(t *testing.T) {
@@ -76,7 +76,7 @@ func TestUncleanStateFail(t *testing.T) {
 
 	err := run.Run(context, "*")
 
-	if (assert.NotNil(t, err)) {
+	if assert.NotNil(t, err) {
 		assert.Contains(t, err.Error(), "The repository has to be clean.")
 	}
 }

@@ -1,10 +1,10 @@
 package functionnal_tests
 
 import (
-	"testing"
 	"github.com/lesfurets/git-octopus/run"
 	"github.com/lesfurets/git-octopus/test"
 	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 func TestFastForward(t *testing.T) {
