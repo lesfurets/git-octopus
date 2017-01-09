@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/lesfurets/git-octopus.svg?branch=master)](https://travis-ci.org/lesfurets/git-octopus)
+[![codecov](https://codecov.io/gh/lesfurets/git-octopus/branch/master/graph/badge.svg)](https://codecov.io/gh/lesfurets/git-octopus)
 
 # git-octopus
 >The continuous merge workflow is meant for continuous integration/delivery and is based on feature branching. git-octopus provides git commands to implement it.
