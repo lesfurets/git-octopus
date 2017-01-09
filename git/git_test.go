@@ -35,3 +35,19 @@ func TestGitCommand(t *testing.T) {
 
 	assert.Nil(t, err)
 }
+
+func TestGitError(t *testing.T) {
+	dir, _ := ioutil.TempDir("", "git-octopus-test-")
+	defer os.RemoveAll(dir)
+
+	repo := Repository{Path: dir}
+
+	repo.Git("init")
+
+	_, err := repo.Git("rev-parse", "HEAD")
+
+	if assert.NotNil(t, err) {
+		assert.Contains(t, err.Error(),
+			"ambiguous argument 'HEAD': unknown revision or path not in the working tree.")
+	}
+}
