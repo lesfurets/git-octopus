@@ -7,6 +7,7 @@ script:
     - git --version
     # To run tests while developing, use 'go test ./...'
     - ./code-coverage.sh
+    - test -z "$(gofmt -l **/*.go 2>&1)"
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
