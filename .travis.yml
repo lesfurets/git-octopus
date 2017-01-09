@@ -5,4 +5,8 @@ go:
 
 script:
     - git --version
-    - go test ./...
+    # To run tests while developing, use 'go test ./...'
+    - ./code-coverage.sh
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
