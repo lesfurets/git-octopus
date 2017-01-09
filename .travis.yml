@@ -4,4 +4,5 @@ go:
     - 1.7.x
 
 script:
+    - git --version
     - go test ./...
