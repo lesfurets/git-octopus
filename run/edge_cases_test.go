@@ -1,37 +1,36 @@
-package functionnal_tests
+package run
 
 import (
-	"github.com/lesfurets/git-octopus/run"
 	"github.com/lesfurets/git-octopus/test"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestOctopusCommitConfigError(t *testing.T) {
-	context, _ := run.CreateTestContext()
+	context, _ := CreateTestContext()
 	defer test.Cleanup(context.Repo)
 
 	context.Repo.Git("config", "octopus.commit", "bad_value")
 
-	err := run.Run(context, "-v")
+	err := Run(context, "-v")
 
 	assert.NotNil(t, err)
 }
 
 func TestOctopusNoPatternGiven(t *testing.T) {
-	context, out := run.CreateTestContext()
+	context, out := CreateTestContext()
 	defer test.Cleanup(context.Repo)
 
-	run.Run(context)
+	Run(context)
 
 	assert.Equal(t, "Nothing to merge. No pattern given\n", out.String())
 }
 
 func TestOctopusNoBranchMatching(t *testing.T) {
-	context, out := run.CreateTestContext()
+	context, out := CreateTestContext()
 	defer test.Cleanup(context.Repo)
 
-	run.Run(context, "refs/remotes/dumb/*", "refs/remotes/dumber/*")
+	Run(context, "refs/remotes/dumb/*", "refs/remotes/dumber/*")
 
 	assert.Contains(t, out.String(), "No branch matching \"refs/remotes/dumb/* refs/remotes/dumber/*\" were found\n")
 }
@@ -39,7 +38,7 @@ func TestOctopusNoBranchMatching(t *testing.T) {
 // Merge a branch that is already merged.
 // Should be noop and print something accordingly
 func TestOctopusAlreadyUpToDate(t *testing.T) {
-	context, out := run.CreateTestContext()
+	context, out := CreateTestContext()
 	defer test.Cleanup(context.Repo)
 
 	// commit a file in master
@@ -53,7 +52,7 @@ func TestOctopusAlreadyUpToDate(t *testing.T) {
 
 	expected, _ := context.Repo.Git("rev-parse", "HEAD")
 
-	err := run.Run(context, "outdated_branch")
+	err := Run(context, "outdated_branch")
 
 	actual, _ := context.Repo.Git("rev-parse", "HEAD")
 
@@ -68,13 +67,13 @@ func TestOctopusAlreadyUpToDate(t *testing.T) {
 
 // git-octopus should prevent from running if status is not clean
 func TestUncleanStateFail(t *testing.T) {
-	context, _ := run.CreateTestContext()
+	context, _ := CreateTestContext()
 	defer test.Cleanup(context.Repo)
 
 	// create and commit a file
 	writeFile(context.Repo, "foo", "First line")
 
-	err := run.Run(context, "*")
+	err := Run(context, "*")
 
 	if assert.NotNil(t, err) {
 		assert.Contains(t, err.Error(), "The repository has to be clean.")

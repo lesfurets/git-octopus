@@ -1,8 +1,7 @@
-package functionnal_tests
+package run
 
 import (
 	"github.com/lesfurets/git-octopus/git"
-	"github.com/lesfurets/git-octopus/run"
 	"github.com/lesfurets/git-octopus/test"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
@@ -13,10 +12,10 @@ import (
 )
 
 func TestVersion(t *testing.T) {
-	context, out := run.CreateTestContext()
+	context, out := CreateTestContext()
 	defer test.Cleanup(context.Repo)
 
-	run.Run(context, "-v")
+	Run(context, "-v")
 
 	assert.Equal(t, "2.0\n", out.String())
 }
@@ -28,7 +27,7 @@ func writeFile(repo *git.Repository, name string, lines ...string) {
 
 // Basic merge of 3 branches. Asserts the resulting tree and the merge commit
 func TestOctopus3branches(t *testing.T) {
-	context, _ := run.CreateTestContext()
+	context, _ := CreateTestContext()
 	repo := context.Repo
 	defer test.Cleanup(repo)
 
@@ -53,7 +52,7 @@ func TestOctopus3branches(t *testing.T) {
 	// Merge the 3 branches in a new octopus branch
 	repo.Git("checkout", "-b", "octopus", "master")
 
-	err := run.Run(context, "branch*")
+	err := Run(context, "branch*")
 	assert.Nil(t, err)
 
 	// The working tree should have the 3 files and status should be clean
@@ -83,5 +82,5 @@ func TestOctopus3branches(t *testing.T) {
 			"refs/heads/branch1\n"+
 			"refs/heads/branch2\n"+
 			"refs/heads/branch3\n"+
-			"\nCommit created by git-octopus "+run.VERSION+".")
+			"\nCommit created by git-octopus "+VERSION+".")
 }

@@ -3,6 +3,9 @@ package git
 import (
 	"github.com/stretchr/testify/assert"
 	"testing"
+	"os"
+	"path/filepath"
+	"io/ioutil"
 )
 
 func TestParseLsRemoteEmpty(t *testing.T) {
@@ -18,4 +21,17 @@ func TestParseLsRemote(t *testing.T) {
 		{Ref: "refs/heads/go_rewrite", Sha1: "5b2b1bf1cdf1150f34bd5809a038b292dc560998"},
 	}
 	assert.Equal(t, expected, ParseLsRemote(lsRemoteOutput))
+}
+
+func TestGitCommand(t *testing.T) {
+	dir, _ := ioutil.TempDir("", "git-octopus-test-")
+	defer os.RemoveAll(dir)
+
+	repo := Repository{Path: dir}
+
+	repo.Git("init")
+
+	_, err := os.Stat(filepath.Join(dir, ".git"))
+
+	assert.Nil(t, err)
 }

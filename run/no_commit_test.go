@@ -1,14 +1,13 @@
-package functionnal_tests
+package run
 
 import (
-	"github.com/lesfurets/git-octopus/run"
 	"github.com/lesfurets/git-octopus/test"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestFastForward(t *testing.T) {
-	context, _ := run.CreateTestContext()
+	context, _ := CreateTestContext()
 	repo := context.Repo
 	defer test.Cleanup(repo)
 
@@ -23,7 +22,7 @@ func TestFastForward(t *testing.T) {
 
 	expected, _ := repo.Git("rev-parse", "HEAD")
 
-	run.Run(context, "-n", "new_branch")
+	Run(context, "-n", "new_branch")
 
 	actual, _ := repo.Git("rev-parse", "HEAD")
 	assert.Equal(t, expected, actual)
@@ -33,7 +32,7 @@ func TestFastForward(t *testing.T) {
 }
 
 func TestConflictState(t *testing.T) {
-	context, _ := run.CreateTestContext()
+	context, _ := CreateTestContext()
 	repo := context.Repo
 	defer test.Cleanup(repo)
 
@@ -52,7 +51,7 @@ func TestConflictState(t *testing.T) {
 	repo.Git("checkout", "master")
 	expected, _ := repo.Git("rev-parse", "HEAD")
 
-	err := run.Run(context, "-n", "a_branch")
+	err := Run(context, "-n", "a_branch")
 
 	assert.NotNil(t, err)
 	actual, _ := repo.Git("rev-parse", "HEAD")
