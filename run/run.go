@@ -7,6 +7,7 @@ import (
 	"github.com/lesfurets/git-octopus/git"
 	"github.com/lesfurets/git-octopus/test"
 	"log"
+	"fmt"
 )
 
 type OctopusContext struct {
@@ -157,7 +158,14 @@ func CreateTestContext() (*OctopusContext, *bytes.Buffer) {
 	repo := git.Repository{Path: dir}
 
 	repo.Git("init")
-	repo.Git("commit", "--allow-empty", "-m\"first commit\"")
+	repo.Git("config", "user.name", "gotest")
+	repo.Git("config", "user.email", "gotest@golang.com")
+	_, err := repo.Git("commit", "--allow-empty", "-m\"first commit\"")
+
+	if err != nil {
+		fmt.Println("There's something wrong with the git installation:")
+		fmt.Println(err.Error())
+	}
 
 	out := bytes.NewBufferString("")
 

@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"os/exec"
 	"strings"
+	"bytes"
+	"errors"
 )
 
 type LsRemoteEntry struct {
@@ -34,7 +36,14 @@ type Repository struct {
 }
 
 func (repo *Repository) Git(args ...string) (string, error) {
-	out, err := exec.Command("git", append([]string{"-C", repo.Path}, args...)...).Output()
+	cmd := exec.Command("git", append([]string{"-C", repo.Path}, args...)...)
+	errOut := bytes.NewBufferString("")
+	cmd.Stderr = errOut
+	out, err := cmd.Output()
+
+	if err != nil {
+		return "", errors.New(errOut.String())
+	}
 
 	stringOut := strings.TrimSpace(string(out[:]))
 
