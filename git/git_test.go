@@ -2,10 +2,10 @@ package git
 
 import (
 	"github.com/stretchr/testify/assert"
-	"testing"
+	"io/ioutil"
 	"os"
 	"path/filepath"
-	"io/ioutil"
+	"testing"
 )
 
 func TestParseLsRemoteEmpty(t *testing.T) {

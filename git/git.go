@@ -2,10 +2,10 @@ package git
 
 import (
 	"bufio"
-	"os/exec"
-	"strings"
 	"bytes"
 	"errors"
+	"os/exec"
+	"strings"
 )
 
 type LsRemoteEntry struct {

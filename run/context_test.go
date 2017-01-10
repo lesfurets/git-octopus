@@ -2,9 +2,9 @@ package run
 
 import (
 	"bytes"
-	"github.com/lesfurets/git-octopus/test"
-	"github.com/lesfurets/git-octopus/git"
 	"fmt"
+	"github.com/lesfurets/git-octopus/git"
+	"github.com/lesfurets/git-octopus/test"
 	"log"
 )
 
