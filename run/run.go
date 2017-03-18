@@ -113,7 +113,9 @@ func mergeHeads(context *OctopusContext, remotes []git.LsRemoteEntry) ([]string,
 
 		context.Logger.Println("Trying simple merge with " + lsRemoteEntry.Ref)
 
-		_, err = context.Repo.Git("read-tree", "-u", "-m", "--aggressive", common, mrt, lsRemoteEntry.Sha1)
+		commonArray := strings.Split(common, "\n")
+		_, err = context.Repo.Git(append([]string{"read-tree", "-u", "-m", "--aggressive"},
+			append(commonArray, mrt, lsRemoteEntry.Sha1)...)...)
 
 		if err != nil {
 			return nil, err
