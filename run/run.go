@@ -51,8 +51,14 @@ func Run(context *OctopusContext, args ...string) error {
 
 	context.Logger.Println()
 
+	initialHeadCommit, _ := context.Repo.Git("rev-parse", "HEAD")
+
 	mergeStrategy := chooseMergeStrategy(octopusConfig)
 	err = mergeStrategy(context, octopusConfig, branchList)
+
+	if !octopusConfig.DoCommit {
+		context.Repo.Git("reset", "-q", "--hard", initialHeadCommit)
+	}
 
 	context.Logger.Println()
 
@@ -119,12 +125,7 @@ func octopusWithRecursiveFallbackStrategy(context *OctopusContext, octopusConfig
 
 func octopusStrategy(context *OctopusContext, octopusConfig *config.OctopusConfig,
 	branchList []git.LsRemoteEntry) error {
-	initialHeadCommit, _ := context.Repo.Git("rev-parse", "HEAD")
 	parents, err := mergeHeads(context, branchList)
-
-	if !octopusConfig.DoCommit {
-		context.Repo.Git("reset", "-q", "--hard", initialHeadCommit)
-	}
 
 	if err != nil {
 		return err
@@ -147,12 +148,7 @@ func octopusStrategy(context *OctopusContext, octopusConfig *config.OctopusConfi
 func recursiveStrategy(context *OctopusContext, octopusConfig *config.OctopusConfig,
 	branchList []git.LsRemoteEntry) error {
 	context.Logger.Println("Merging using recursive mode")
-	initialHeadCommit, _ := context.Repo.Git("rev-parse", "HEAD")
 	_, err := mergeRecursive(context, branchList)
-
-	if !octopusConfig.DoCommit {
-		context.Repo.Git("reset", "-q", "--hard", initialHeadCommit)
-	}
 
 	return err
 }
