@@ -1,11 +1,14 @@
 package run
 
 import (
+	"bufio"
 	"bytes"
 	"errors"
+	"log"
+	"strings"
+
 	"github.com/lesfurets/git-octopus/config"
 	"github.com/lesfurets/git-octopus/git"
-	"log"
 )
 
 type OctopusContext struct {
@@ -46,15 +49,83 @@ func Run(context *OctopusContext, args ...string) error {
 		return nil
 	}
 
-	initialHeadCommit, _ := context.Repo.Git("rev-parse", "HEAD")
-
 	context.Logger.Println()
 
-	parents, err := mergeHeads(context, branchList)
+	initialHeadCommit, _ := context.Repo.Git("rev-parse", "HEAD")
+
+	mergeStrategy := chooseMergeStrategy(octopusConfig)
+	err = mergeStrategy(context, octopusConfig, branchList)
 
 	if !octopusConfig.DoCommit {
 		context.Repo.Git("reset", "-q", "--hard", initialHeadCommit)
 	}
+
+	context.Logger.Println()
+
+	return err
+}
+
+type strategy func(context *OctopusContext, octopusConfig *config.OctopusConfig, branchList []git.LsRemoteEntry) error
+
+func chooseMergeStrategy(octopusConfig *config.OctopusConfig) strategy {
+	chunkMode := octopusConfig.ChunkSize > 0
+	if octopusConfig.RecursiveMode {
+		if chunkMode {
+			return chunckBranches(octopusWithRecursiveFallbackStrategy)
+		}
+		return recursiveStrategy
+	}
+	if chunkMode {
+		return chunckBranches(octopusStrategy)
+	}
+	return octopusStrategy
+}
+
+func chunckBranches(mergeStrategy strategy) strategy {
+	return func(context *OctopusContext, octopusConfig *config.OctopusConfig, branchList []git.LsRemoteEntry) error {
+		var remaning []git.LsRemoteEntry = branchList
+		chunkSize := octopusConfig.ChunkSize
+		acc := 1
+		lenBranchList := len(branchList)
+		context.Logger.Printf("Will merge %d branches by chunks of %d", lenBranchList, chunkSize)
+		for len(remaning) > 0 {
+			var current []git.LsRemoteEntry
+			if len(remaning) > chunkSize {
+				current, remaning = remaning[:chunkSize], remaning[chunkSize:]
+			} else {
+				current, remaning = remaning, nil
+			}
+			lcur := len(current)
+			context.Logger.Printf("Merging chunks %d to %d (out of %d)\n", acc, acc+lcur-1, lenBranchList)
+			acc += lcur
+			err := mergeStrategy(context, octopusConfig, current)
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+}
+
+func octopusWithRecursiveFallbackStrategy(context *OctopusContext, octopusConfig *config.OctopusConfig,
+	branchList []git.LsRemoteEntry) error {
+
+	currentHeadCommit, _ := context.Repo.Git("rev-parse", "HEAD")
+	err := octopusStrategy(context, octopusConfig, branchList)
+	if err != nil {
+		if len(err.Error()) > 0 {
+			context.Logger.Println(err.Error())
+		}
+		context.Logger.Printf("Octopus strategy failed for branches %v, fallback to one by one recursive merge\n", branchList)
+		context.Repo.Git("reset", "-q", "--hard", currentHeadCommit)
+		err = recursiveStrategy(context, octopusConfig, branchList)
+	}
+	return err
+}
+
+func octopusStrategy(context *OctopusContext, octopusConfig *config.OctopusConfig,
+	branchList []git.LsRemoteEntry) error {
+	parents, err := mergeHeads(context, branchList)
 
 	if err != nil {
 		return err
@@ -71,8 +142,52 @@ func Run(context *OctopusContext, args ...string) error {
 		commit, _ := context.Repo.Git(args...)
 		context.Repo.Git("update-ref", "HEAD", commit)
 	}
-
 	return nil
+}
+
+func recursiveStrategy(context *OctopusContext, octopusConfig *config.OctopusConfig,
+	branchList []git.LsRemoteEntry) error {
+	context.Logger.Println("Merging using recursive mode")
+	_, err := mergeRecursive(context, branchList)
+
+	return err
+}
+
+func mergeRecursive(context *OctopusContext, remotes []git.LsRemoteEntry) ([]string, error) {
+	head, _ := context.Repo.Git("rev-parse", "--verify", "-q", "HEAD")
+	mrc := []string{head}
+	for _, lsRemoteEntry := range remotes {
+		context.Logger.Println("Merging " + lsRemoteEntry.Ref)
+		log, _ := context.Repo.Git("merge", "--no-commit", "--rerere-autoupdate", lsRemoteEntry.Ref)
+		if len(log) > 0 {
+			context.Logger.Println(log)
+		}
+
+		status, _ := context.Repo.Git("status", "--porcelain")
+		if isMergeStatusOk(context, status) {
+			context.Repo.Git("commit", "--no-edit")
+			mrc = append(mrc, lsRemoteEntry.Sha1)
+		} else {
+			return nil, errors.New("Unresolved merge conflict:\n" + status)
+		}
+	}
+	context.Repo.Git("commit", "-m", octopusCommitMessage(remotes), "--allow-empty")
+	return mrc, nil
+}
+
+// Takes the output of git-ls-remote. Returns a map refsname => sha1
+func isMergeStatusOk(context *OctopusContext, status string) bool {
+	scanner := bufio.NewScanner(strings.NewReader(status))
+	for scanner.Scan() {
+		split := strings.Fields(scanner.Text())
+
+		switch split[0] {
+		case "DD", "AU", "UD", "UA", "DU", "AA", "UU":
+			return false
+		}
+	}
+
+	return true
 }
 
 // The logic of this function is copied directly from git-merge-octopus.sh
@@ -113,7 +228,9 @@ func mergeHeads(context *OctopusContext, remotes []git.LsRemoteEntry) ([]string,
 
 		context.Logger.Println("Trying simple merge with " + lsRemoteEntry.Ref)
 
-		_, err = context.Repo.Git("read-tree", "-u", "-m", "--aggressive", common, mrt, lsRemoteEntry.Sha1)
+		commonArray := strings.Split(common, "\n")
+		_, err = context.Repo.Git(append([]string{"read-tree", "-u", "-m", "--aggressive"},
+			append(commonArray, mrt, lsRemoteEntry.Sha1)...)...)
 
 		if err != nil {
 			return nil, err

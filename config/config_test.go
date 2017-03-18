@@ -1,10 +1,11 @@
 package config
 
 import (
+	"testing"
+
 	"github.com/lesfurets/git-octopus/git"
 	"github.com/lesfurets/git-octopus/test"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func createTestRepo() *git.Repository {
@@ -144,5 +145,26 @@ func TestPatterns(t *testing.T) {
 
 	// THEN arguments should take precedence
 	assert.Equal(t, []string{"arg1", "arg2"}, octopusConfig.Patterns)
+	assert.Nil(t, err)
+}
+
+func TestRecurisveMode(t *testing.T) {
+	repo := createTestRepo()
+	defer test.Cleanup(repo)
+
+	// GIVEN No option
+	// WHEN
+	octopusConfig, err := GetOctopusConfig(repo, nil)
+
+	// THEN RecursiveMode should be false
+	assert.False(t, octopusConfig.RecursiveMode)
+	assert.Nil(t, err)
+
+	// GIVEN option -r
+	// WHEN
+	octopusConfig, err = GetOctopusConfig(repo, []string{"-r"})
+
+	// THEN RecursiveMode should be true
+	assert.True(t, octopusConfig.RecursiveMode)
 	assert.Nil(t, err)
 }
