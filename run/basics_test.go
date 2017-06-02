@@ -84,3 +84,29 @@ func TestOctopus3branches(t *testing.T) {
 			"refs/heads/branch3\n"+
 			"\nCommit created by git-octopus "+VERSION+".")
 }
+
+func TestOneBranchFastForward(t *testing.T) {
+	//given
+	context, _ := CreateTestContext()
+	repo := context.Repo
+	defer test.Cleanup(repo)
+
+	repo.Git("checkout", "-b", "feature/test")
+	writeFile(repo, "testFeature", "")
+	repo.Git("add", "testFeature")
+	repo.Git("commit", "-m", "add testFeature")
+	repo.Git("rev-parse", "HEAD")
+	repo.Git("checkout", "master")
+
+	//when
+	Run(context, "feature/*")
+
+	//then
+	// feature/test should be merged in master
+	actual, _ := repo.Git("branch", "--contains", "feature/test")
+	assert.Contains(t, actual, "master")
+
+	// Status should be clean
+	status, _ := context.Repo.Git("status", "--porcelain")
+	assert.Empty(t, status)
+}
