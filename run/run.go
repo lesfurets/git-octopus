@@ -60,8 +60,7 @@ func Run(context *OctopusContext, args ...string) error {
 		return err
 	}
 
-	// parents always contains HEAD. We need at lease 2 parents to create a merge commit
-	if octopusConfig.DoCommit && parents != nil && len(parents) > 1 {
+	if octopusConfig.DoCommit && parents != nil && len(parents) > 0 {
 		tree, _ := context.Repo.Git("write-tree")
 		args := []string{"commit-tree"}
 		for _, parent := range parents {
