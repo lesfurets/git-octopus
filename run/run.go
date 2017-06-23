@@ -60,7 +60,8 @@ func Run(context *OctopusContext, args ...string) error {
 		return err
 	}
 
-	if octopusConfig.DoCommit && parents != nil && len(parents) > 0 {
+	// parents always contains HEAD. We need at least 2 parents to create a merge commit
+	if octopusConfig.DoCommit && parents != nil && len(parents) > 1 {
 		tree, _ := context.Repo.Git("write-tree")
 		args := []string{"commit-tree"}
 		for _, parent := range parents {
@@ -80,7 +81,6 @@ func mergeHeads(context *OctopusContext, remotes []git.LsRemoteEntry) ([]string,
 
 	mrc := []string{head}
 	mrt, _ := context.Repo.Git("write-tree")
-	nonFfMerge := false
 
 	for _, lsRemoteEntry := range remotes {
 
@@ -94,21 +94,6 @@ func mergeHeads(context *OctopusContext, remotes []git.LsRemoteEntry) ([]string,
 			context.Logger.Println("Already up-to-date with " + lsRemoteEntry.Ref)
 			continue
 		}
-
-		if len(mrc) == 1 && common == mrc[0] && !nonFfMerge {
-			context.Logger.Println("Fast-forwarding to: " + lsRemoteEntry.Ref)
-			_, err := context.Repo.Git("read-tree", "-u", "-m", head, lsRemoteEntry.Sha1)
-
-			if err != nil {
-				return nil, nil
-			}
-
-			mrc[0] = lsRemoteEntry.Sha1
-			mrt, _ = context.Repo.Git("write-tree")
-			continue
-		}
-
-		nonFfMerge = true
 
 		context.Logger.Println("Trying simple merge with " + lsRemoteEntry.Ref)
 
