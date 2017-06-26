@@ -95,7 +95,7 @@ func TestOneBranchFastForward(t *testing.T) {
 	writeFile(repo, "testFeature", "")
 	repo.Git("add", "testFeature")
 	repo.Git("commit", "-m", "add testFeature")
-	repo.Git("rev-parse", "HEAD")
+	testFeatureSha1, _ := repo.Git("rev-parse", "HEAD")
 	repo.Git("checkout", "master")
 
 	//when
@@ -109,4 +109,9 @@ func TestOneBranchFastForward(t *testing.T) {
 	// Status should be clean
 	status, _ := context.Repo.Git("status", "--porcelain")
 	assert.Empty(t, status)
+
+	// Assert that master has been fast forwarded to feature/test
+	masterSha1, _ := repo.Git("rev-parse", "HEAD")
+	assert.Equal(t, testFeatureSha1, masterSha1)
+
 }
