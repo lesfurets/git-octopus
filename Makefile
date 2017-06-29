@@ -54,7 +54,7 @@ uninstall:
 	rm $(htmldir)/git-octopus.html
 	rm $(htmldir)/git-conflict.html
 
-go-build = GOOS=$(1) GOARCH=$(2) go build -o git-octopus-$(1)-$(2)-2.0.beta1
+go-build = GOOS=$(1) GOARCH=$(2) go build -o git-octopus-$(1)-$(2)-2.0.beta2
 
 go-cross-compile:
 	$(call go-build,darwin,386)
