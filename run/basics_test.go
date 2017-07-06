@@ -115,3 +115,41 @@ func TestOneBranchFastForward(t *testing.T) {
 	assert.Equal(t, testFeatureSha1, masterSha1)
 
 }
+
+func TestTwoBranchesFastForward(t *testing.T) {
+	//given
+	context, _ := CreateTestContext()
+	repo := context.Repo
+	defer test.Cleanup(repo)
+
+	//a feature branch from master with a commit
+	repo.Git("checkout", "-b", "feature/test")
+	writeFile(repo, "testFeature", "firstline")
+	repo.Git("add", "testFeature")
+	repo.Git("commit", "-m", "add testFeature")
+
+	//a second branch from feature/test with a commit
+	repo.Git("checkout", "-b", "feature/test2")
+	writeFile(repo, "testFeature", "firstline", "secondline")
+	repo.Git("add", "testFeature")
+	repo.Git("commit", "-m", "modify testFeature")
+
+	testFeatureSha1, _ := repo.Git("rev-parse", "HEAD")
+	repo.Git("checkout", "master")
+
+	//when
+	Run(context, "feature/*")
+
+	//then
+	// feature/test2 should be merged in master
+	actual, _ := repo.Git("branch", "--contains", "feature/test2")
+	assert.Contains(t, actual, "master")
+
+	// Status should be clean
+	status, _ := context.Repo.Git("status", "--porcelain")
+	assert.Empty(t, status)
+
+	// Assert that master has been fast forwarded to feature/test2
+	masterSha1, _ := repo.Git("rev-parse", "HEAD")
+	assert.Equal(t, testFeatureSha1, masterSha1)
+}
