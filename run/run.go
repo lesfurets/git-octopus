@@ -13,19 +13,12 @@ type OctopusContext struct {
 	Logger *log.Logger
 }
 
-const VERSION = "2.0"
-
 func Run(context *OctopusContext, args ...string) error {
 
 	octopusConfig, err := config.GetOctopusConfig(context.Repo, args)
 
 	if err != nil {
 		return err
-	}
-
-	if octopusConfig.PrintVersion {
-		context.Logger.Println(VERSION)
-		return nil
 	}
 
 	if len(octopusConfig.Patterns) == 0 {
@@ -155,6 +148,6 @@ func octopusCommitMessage(remotes []git.LsRemoteEntry) string {
 	for _, lsRemoteEntry := range remotes {
 		buf.WriteString(lsRemoteEntry.Ref + "\n")
 	}
-	buf.WriteString("\nCommit created by git-octopus " + VERSION + ".\n")
+	buf.WriteString("\nCommit created by git-octopus.\n")
 	return buf.String()
 }
