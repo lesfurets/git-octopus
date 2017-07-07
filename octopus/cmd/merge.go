@@ -26,13 +26,9 @@ import (
 // mergeCmd represents the merge command
 var mergeCmd = &cobra.Command{
 	Use:   "merge",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "A git extension to merge multiple branches",
+	Long: `A git extension to merge multiple branches.
+TODO verbose description`,
 	Run: merge,
 }
 
@@ -81,11 +77,16 @@ func handleSignals(signalChan chan os.Signal, context *run.OctopusContext) {
 func init() {
 	RootCmd.AddCommand(mergeCmd)
 
-	// Here you will define your flags and configuration settings.
+	// flags and configuration settings.
 
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// mergeCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// --check
+	mergeCmd.PersistentFlags().Bool("check", false, "checks if the merge works. Leaves the repository back to HEAD")
+
+	// --chunk
+	mergeCmd.PersistentFlags().Int("chunk", 1, "do the octopus merge split by chunks of n branches")
+
+	// --exclude
+	mergeCmd.PersistentFlags().StringArray("exclude", nil, "excludes branches matching the pattern")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
