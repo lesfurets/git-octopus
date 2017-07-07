@@ -16,7 +16,7 @@ package cmd
 
 import (
 	"github.com/lesfurets/git-octopus/git"
-	"github.com/lesfurets/git-octopus/run"
+	"github.com/lesfurets/git-octopus/octopus/merge"
 	"github.com/spf13/cobra"
 	"log"
 	"os"
@@ -29,13 +29,13 @@ var mergeCmd = &cobra.Command{
 	Short: "A git extension to merge multiple branches",
 	Long: `A git extension to merge multiple branches.
 TODO verbose description`,
-	Run: merge,
+	Run: runMergeCmd,
 }
 
-func merge(cmd *cobra.Command, args []string) {
+func runMergeCmd(cmd *cobra.Command, args []string) {
 	repo := git.Repository{Path: "."}
 
-	context := run.OctopusContext{
+	context := merge.MergeContext{
 		Repo:   &repo,
 		Logger: log.New(os.Stdout, "", 0),
 	}
@@ -45,7 +45,7 @@ func merge(cmd *cobra.Command, args []string) {
 
 	go handleSignals(signalChan, &context)
 
-	err := run.Run(&context, os.Args[1:]...)
+	err := merge.Merge(&context, args)
 
 	if err != nil {
 		if len(err.Error()) > 0 {
@@ -55,7 +55,7 @@ func merge(cmd *cobra.Command, args []string) {
 	}
 }
 
-func handleSignals(signalChan chan os.Signal, context *run.OctopusContext) {
+func handleSignals(signalChan chan os.Signal, context *merge.MergeContext) {
 	initialHeadCommit, _ := context.Repo.Git("rev-parse", "HEAD")
 	/*
 	 The behavior of this is quite tricky. The signal is not only received on signalChan
