@@ -9,6 +9,7 @@ import (
 )
 
 type OctopusConfig struct {
+	PrintVersion     bool
 	DoCommit         bool
 	ChunkSize        int
 	ExcludedPatterns []string
@@ -28,11 +29,12 @@ func (e *excluded_patterns) Set(value string) error {
 
 func GetOctopusConfig(repo *git.Repository, args []string) (*OctopusConfig, error) {
 
-	var noCommitArg, commitArg bool
+	var printVersion, noCommitArg, commitArg bool
 	var chunkSizeArg int
 	var excludedPatternsArg excluded_patterns
 
 	var commandLine = flag.NewFlagSet("git-octopus", flag.ExitOnError)
+	commandLine.BoolVar(&printVersion, "v", false, "prints the version of git-octopus.")
 	commandLine.BoolVar(&noCommitArg, "n", false, "leaves the repository back to HEAD.")
 	commandLine.BoolVar(&commitArg, "c", false, "Commit the resulting merge in the current branch.")
 	commandLine.IntVar(&chunkSizeArg, "s", 0, "do the octopus by chunk of n branches.")
@@ -86,6 +88,7 @@ func GetOctopusConfig(repo *git.Repository, args []string) (*OctopusConfig, erro
 	}
 
 	return &OctopusConfig{
+		PrintVersion:     printVersion,
 		DoCommit:         configCommit,
 		ChunkSize:        chunkSizeArg,
 		ExcludedPatterns: excludedPatterns,
