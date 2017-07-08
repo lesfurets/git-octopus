@@ -14,13 +14,13 @@ type MergeContext struct {
 
 func Merge(context *MergeContext, args []string) error {
 
-	octopusConfig, err := GetConfig(args)
+	mergeConfig, err := GetConfig(args)
 
 	if err != nil {
 		return err
 	}
 
-	if len(octopusConfig.Patterns) == 0 {
+	if len(mergeConfig.Patterns) == 0 {
 		context.Logger.Println("Nothing to merge. No pattern given")
 		return nil
 	}
@@ -32,7 +32,7 @@ func Merge(context *MergeContext, args []string) error {
 		return errors.New("The repository has to be clean.")
 	}
 
-	branchList := resolveBranchList(context.Repo, context.Logger, octopusConfig.Patterns, octopusConfig.ExcludedPatterns)
+	branchList := resolveBranchList(context.Repo, context.Logger, mergeConfig.Patterns, mergeConfig.ExcludedPatterns)
 
 	if len(branchList) == 0 {
 		return nil
@@ -44,7 +44,7 @@ func Merge(context *MergeContext, args []string) error {
 
 	parents, err := mergeHeads(context, branchList)
 
-	if octopusConfig.NoCommit {
+	if mergeConfig.NoCommit {
 		context.Repo.Git("reset", "-q", "--hard", initialHeadCommit)
 	}
 
@@ -53,7 +53,7 @@ func Merge(context *MergeContext, args []string) error {
 	}
 
 	// parents always contains HEAD. We need at lease 2 parents to create a merge commit
-	if !octopusConfig.NoCommit && parents != nil && len(parents) > 1 {
+	if !mergeConfig.NoCommit && parents != nil && len(parents) > 1 {
 		tree, _ := context.Repo.Git("write-tree")
 		args := []string{"commit-tree"}
 		for _, parent := range parents {
