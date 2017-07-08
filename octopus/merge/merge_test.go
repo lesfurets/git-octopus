@@ -71,7 +71,10 @@ func TestOctopus3branches(t *testing.T) {
 	// Merge the 3 branches in a new octopus branch
 	repo.Git("checkout", "-b", "octopus", "master")
 
-	err := Merge(context, []string{"branch*"})
+	config := Config{
+		Patterns: []string{"branch*"},
+	}
+	err := Merge(context, &config)
 	assert.Nil(t, err)
 
 	// The working tree should have the 3 files and status should be clean
@@ -108,7 +111,8 @@ func TestOctopusNoPatternGiven(t *testing.T) {
 	context, out := CreateTestContext()
 	defer test.Cleanup(context.Repo)
 
-	Merge(context, nil)
+	config := Config{}
+	Merge(context, &config)
 
 	assert.Equal(t, "Nothing to merge. No pattern given\n", out.String())
 }
@@ -117,7 +121,10 @@ func TestOctopusNoBranchMatching(t *testing.T) {
 	context, out := CreateTestContext()
 	defer test.Cleanup(context.Repo)
 
-	Merge(context, []string{"refs/remotes/dumb/*", "refs/remotes/dumber/*"})
+	config := Config{
+		Patterns: []string{"refs/remotes/dumb/*", "refs/remotes/dumber/*"},
+	}
+	Merge(context, &config)
 
 	assert.Contains(t, out.String(), "No branch matching \"refs/remotes/dumb/* refs/remotes/dumber/*\" were found\n")
 }
@@ -139,7 +146,10 @@ func TestOctopusAlreadyUpToDate(t *testing.T) {
 
 	expected, _ := context.Repo.Git("rev-parse", "HEAD")
 
-	err := Merge(context, []string{"outdated_branch"})
+	config := Config{
+		Patterns: []string{"outdated_branch"},
+	}
+	err := Merge(context, &config)
 
 	actual, _ := context.Repo.Git("rev-parse", "HEAD")
 
@@ -160,7 +170,10 @@ func TestUncleanStateFail(t *testing.T) {
 	// create and commit a file
 	writeFile(context.Repo, "foo", "First line")
 
-	err := Merge(context, []string{"*"})
+	config := Config{
+		Patterns: []string{"*"},
+	}
+	err := Merge(context, &config)
 
 	if assert.NotNil(t, err) {
 		assert.Contains(t, err.Error(), "The repository has to be clean.")
@@ -183,7 +196,11 @@ func TestFastForward(t *testing.T) {
 
 	expected, _ := repo.Git("rev-parse", "HEAD")
 
-	Merge(context, []string{"-n", "new_branch"})
+	config := Config{
+		NoCommit: true,
+		Patterns: []string{"new_branch"},
+	}
+	Merge(context, &config)
 
 	actual, _ := repo.Git("rev-parse", "HEAD")
 	assert.Equal(t, expected, actual)
@@ -212,7 +229,11 @@ func TestConflictState(t *testing.T) {
 	repo.Git("checkout", "master")
 	expected, _ := repo.Git("rev-parse", "HEAD")
 
-	err := Merge(context, []string{"-n", "a_branch"})
+	config := Config{
+		NoCommit: true,
+		Patterns: []string{"a_branch"},
+	}
+	err := Merge(context, &config)
 
 	assert.NotNil(t, err)
 	actual, _ := repo.Git("rev-parse", "HEAD")
