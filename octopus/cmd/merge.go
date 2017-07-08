@@ -46,7 +46,12 @@ func runMergeCmd(cmd *cobra.Command, args []string) {
 
 	go handleSignals(signalChan, &context)
 
-	err := merge.Merge(&context, args)
+	conf, err := merge.GetConfig(args)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	err = merge.Merge(&context, conf)
 
 	if err != nil {
 		if len(err.Error()) > 0 {

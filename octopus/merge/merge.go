@@ -12,13 +12,7 @@ type MergeContext struct {
 	Logger *log.Logger
 }
 
-func Merge(context *MergeContext, args []string) error {
-
-	mergeConfig, err := GetConfig(args)
-
-	if err != nil {
-		return err
-	}
+func Merge(context *MergeContext, mergeConfig *Config) error {
 
 	if len(mergeConfig.Patterns) == 0 {
 		context.Logger.Println("Nothing to merge. No pattern given")
