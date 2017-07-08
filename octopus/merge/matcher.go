@@ -3,7 +3,7 @@ package merge
 import (
 	"bytes"
 	"fmt"
-	"github.com/lesfurets/git-octopus/git"
+	"github.com/lesfurets/git-octopus/octopus/git"
 	"log"
 	"strings"
 )

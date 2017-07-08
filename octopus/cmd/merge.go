@@ -15,7 +15,7 @@
 package cmd
 
 import (
-	"github.com/lesfurets/git-octopus/git"
+	"github.com/lesfurets/git-octopus/octopus/git"
 	"github.com/lesfurets/git-octopus/octopus/merge"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"

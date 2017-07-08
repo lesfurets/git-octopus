@@ -2,8 +2,8 @@ package merge
 
 import (
 	"bytes"
-	"github.com/lesfurets/git-octopus/git"
-	"github.com/lesfurets/git-octopus/test"
+	"github.com/lesfurets/git-octopus/octopus/git"
+	"github.com/lesfurets/git-octopus/octopus/test"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
