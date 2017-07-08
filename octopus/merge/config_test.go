@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestDoCommit(t *testing.T) {
+func TestNoCommit(t *testing.T) {
 	//given
 	args := []string{"a", "b", "c"}
 
@@ -13,7 +13,7 @@ func TestDoCommit(t *testing.T) {
 	cfg, _ := GetConfig(args)
 
 	//then
-	assert.Equal(t, cfg.DoCommit, true)
+	assert.Equal(t, cfg.NoCommit, false)
 }
 
 func TestChunkMode(t *testing.T) {

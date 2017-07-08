@@ -5,7 +5,7 @@ import (
 )
 
 type Config struct {
-	DoCommit         bool
+	NoCommit         bool
 	ChunkSize        int
 	ExcludedPatterns []string
 	Patterns         []string
@@ -18,8 +18,7 @@ func GetConfig(args []string) (*Config, error) {
 	var patterns = args
 
 	return &Config{
-		//TODO reverse DoCommit to NoCommit to simplify logic
-		DoCommit:         !check,
+		NoCommit:         check,
 		ChunkSize:        chunk,
 		ExcludedPatterns: excludedPatterns,
 		Patterns:         patterns,

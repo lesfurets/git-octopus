@@ -44,7 +44,7 @@ func Merge(context *MergeContext, args []string) error {
 
 	parents, err := mergeHeads(context, branchList)
 
-	if !octopusConfig.DoCommit {
+	if octopusConfig.NoCommit {
 		context.Repo.Git("reset", "-q", "--hard", initialHeadCommit)
 	}
 
@@ -53,7 +53,7 @@ func Merge(context *MergeContext, args []string) error {
 	}
 
 	// parents always contains HEAD. We need at lease 2 parents to create a merge commit
-	if octopusConfig.DoCommit && parents != nil && len(parents) > 1 {
+	if !octopusConfig.NoCommit && parents != nil && len(parents) > 1 {
 		tree, _ := context.Repo.Git("write-tree")
 		args := []string{"commit-tree"}
 		for _, parent := range parents {
