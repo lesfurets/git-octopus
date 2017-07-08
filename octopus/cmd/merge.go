@@ -18,6 +18,7 @@ import (
 	"github.com/lesfurets/git-octopus/git"
 	"github.com/lesfurets/git-octopus/octopus/merge"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"log"
 	"os"
 	"os/signal"
@@ -81,12 +82,15 @@ func init() {
 
 	// --check
 	mergeCmd.PersistentFlags().Bool("check", false, "checks if the merge works. Leaves the repository back to HEAD")
+	viper.BindPFlag("check", mergeCmd.PersistentFlags().Lookup("check"))
 
 	// --chunk
-	mergeCmd.PersistentFlags().Int("chunk", 1, "do the octopus merge split by chunks of n branches")
+	mergeCmd.PersistentFlags().Int("chunk", 0, "do the octopus merge split by chunks of n branches")
+	viper.BindPFlag("chunk", mergeCmd.PersistentFlags().Lookup("chunk"))
 
 	// --exclude
-	mergeCmd.PersistentFlags().StringArray("exclude", nil, "excludes branches matching the pattern")
+	mergeCmd.PersistentFlags().StringSlice("exclude", nil, "excludes branches matching the pattern")
+	viper.BindPFlag("exclude", mergeCmd.PersistentFlags().Lookup("exclude"))
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:

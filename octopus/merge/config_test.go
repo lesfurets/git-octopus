@@ -1,148 +1,50 @@
 package merge
 
 import (
-	"github.com/lesfurets/git-octopus/git"
-	"github.com/lesfurets/git-octopus/test"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
-func createTestRepo() *git.Repository {
-	dir := test.CreateTempDir()
-
-	repo := git.Repository{Path: dir}
-
-	repo.Git("init")
-
-	return &repo
-}
-
 func TestDoCommit(t *testing.T) {
-	repo := createTestRepo()
-	defer test.Cleanup(repo)
+	//given
+	args := []string{"a", "b", "c"}
 
-	// GIVEN no config, no option
-	// WHEN
-	octopusConfig, err := GetConfig(repo, nil)
+	//when
+	cfg, _ := GetConfig(args)
 
-	// THEN doCommit should be true
-	assert.True(t, octopusConfig.DoCommit)
-	assert.Nil(t, err)
-
-	// GIVEN config to false, no option
-	repo.Git("config", "octopus.commit", "false")
-	// WHEN
-	octopusConfig, err = GetConfig(repo, nil)
-
-	// THEN doCommit should be false
-	assert.False(t, octopusConfig.DoCommit)
-	assert.Nil(t, err)
-
-	// Config to 0, no option. doCommit should be true
-	repo.Git("config", "octopus.commit", "0")
-	octopusConfig, err = GetConfig(repo, nil)
-
-	assert.False(t, octopusConfig.DoCommit)
-	assert.Nil(t, err)
-
-	// GIVEN config to false, -c option true
-	repo.Git("config", "octopus.commit", "false")
-	// WHEN
-	octopusConfig, err = GetConfig(repo, []string{"-c"})
-
-	// THEN  doCommit should be true
-	assert.True(t, octopusConfig.DoCommit)
-	assert.Nil(t, err)
-
-	// GIVEN config to true, -n option true
-	repo.Git("config", "octopus.commit", "true")
-	// WHEN
-	octopusConfig, err = GetConfig(repo, []string{"-n"})
-
-	// THEN  doCommit should be false
-	assert.False(t, octopusConfig.DoCommit)
-	assert.Nil(t, err)
+	//then
+	assert.Equal(t, cfg.DoCommit, true)
 }
 
 func TestChunkMode(t *testing.T) {
-	repo := createTestRepo()
-	defer test.Cleanup(repo)
+	//given
+	args := []string{"a", "b", "c"}
 
-	// GIVEN No option
-	// WHEN
-	octopusConfig, err := GetConfig(repo, nil)
+	//when
+	cfg, _ := GetConfig(args)
 
-	// THEN chunkSize should be 0
-	assert.Equal(t, 0, octopusConfig.ChunkSize)
-	assert.Nil(t, err)
-
-	// GIVEN option -s 5
-	// WHEN
-	octopusConfig, err = GetConfig(repo, []string{"-s", "5"})
-
-	// THEN chunkSize should be 5
-	assert.Equal(t, 5, octopusConfig.ChunkSize)
-	assert.Nil(t, err)
+	//then
+	assert.Equal(t, cfg.ChunkSize, 0)
 }
 
 func TestExcludedPatterns(t *testing.T) {
-	repo := createTestRepo()
-	defer test.Cleanup(repo)
+	//given
+	args := []string{"a", "b", "c"}
 
-	// GIVEN no config, no option
-	// WHEN
-	octopusConfig, err := GetConfig(repo, nil)
+	//when
+	cfg, _ := GetConfig(args)
 
-	// THEN excludedPatterns should be empty
-	assert.Empty(t, octopusConfig.ExcludedPatterns)
-	assert.Nil(t, err)
-
-	// GIVEN excludePattern config, no option
-	repo.Git("config", "octopus.excludePattern", "excluded/*")
-	repo.Git("config", "--add", "octopus.excludePattern", "excluded_branch")
-	// WHEN
-	octopusConfig, err = GetConfig(repo, nil)
-
-	// THEN excludedPatterns should be set
-	assert.Equal(t, []string{"excluded/*", "excluded_branch"}, octopusConfig.ExcludedPatterns)
-	assert.Nil(t, err)
-
-	// GIVEN excludePattern config (from previous assertion), option given
-	// WHEN
-	octopusConfig, err = GetConfig(repo, []string{"-e", "override_excluded"})
-
-	// THEN option should take precedence
-	assert.Equal(t, []string{"override_excluded"}, octopusConfig.ExcludedPatterns)
-	assert.Nil(t, err)
+	//then
+	assert.Empty(t, cfg.ExcludedPatterns)
 }
 
 func TestPatterns(t *testing.T) {
-	repo := createTestRepo()
-	defer test.Cleanup(repo)
+	//given
+	args := []string{"a", "b", "c"}
 
-	// GIVEN no config, no option
-	// WHEN
-	octopusConfig, err := GetConfig(repo, nil)
+	//when
+	cfg, _ := GetConfig(args)
 
-	// THEN excludedPatterns should be empty
-	assert.Empty(t, octopusConfig.Patterns)
-	assert.Nil(t, err)
-
-	// GIVEN config, no argument.
-	repo.Git("config", "octopus.pattern", "test")
-	repo.Git("config", "--add", "octopus.pattern", "test2")
-	// WHEN
-	octopusConfig, err = GetConfig(repo, nil)
-
-	// THEN patterns should be set
-	assert.Equal(t, []string{"test", "test2"}, octopusConfig.Patterns)
-	assert.Nil(t, err)
-
-	// GIVEN config (from previous assertion), argument given
-	// WHEN
-	octopusConfig, err = GetConfig(repo, []string{"arg1", "arg2"})
-
-	// THEN arguments should take precedence
-	assert.Equal(t, []string{"arg1", "arg2"}, octopusConfig.Patterns)
-	assert.Nil(t, err)
+	//then
+	assert.Equal(t, cfg.Patterns, args)
 }

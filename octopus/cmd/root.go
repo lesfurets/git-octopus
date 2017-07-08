@@ -61,6 +61,7 @@ func initConfig() {
 
 	viper.SetConfigName(".octopus") // name of config file (without extension)
 	viper.AddConfigPath("$HOME")    // adding home directory as first search path
+	viper.AddConfigPath(".")        // adding current directory as second search path
 	viper.AutomaticEnv()            // read in environment variables that match
 
 	// If a config file is found, read it in.

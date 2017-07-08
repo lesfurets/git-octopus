@@ -14,7 +14,7 @@ type MergeContext struct {
 
 func Merge(context *MergeContext, args []string) error {
 
-	octopusConfig, err := GetConfig(context.Repo, args)
+	octopusConfig, err := GetConfig(args)
 
 	if err != nil {
 		return err
