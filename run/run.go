@@ -105,7 +105,7 @@ func mergeHeads(context *OctopusContext, remotes []git.LsRemoteEntry) ([]string,
 		if len(mrc) == 1 && common == mrc[0] && !nonFfMerge {
 			context.Logger.Println("Fast-forwarding to: " + lsRemoteEntry.Ref)
 
-			_, err := context.Repo.Git("read-tree", "-u", "-m", head, lsRemoteEntry.Sha1)
+			_, err := context.Repo.Git("read-tree", "-u", "-m", mrc[0], lsRemoteEntry.Sha1)
 
 			if err != nil {
 				return nil, err
