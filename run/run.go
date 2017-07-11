@@ -88,7 +88,7 @@ func mergeHeads(context *OctopusContext, remotes []git.LsRemoteEntry) ([]string,
 
 	mrc := []string{head}
 	mrt, _ := context.Repo.Git("write-tree")
-	nonFfMerge := false
+	isFfMerge := true
 
 	for _, lsRemoteEntry := range remotes {
 		common, err := context.Repo.Git(append([]string{"merge-base", "--all", lsRemoteEntry.Sha1}, mrc...)...)
@@ -102,7 +102,7 @@ func mergeHeads(context *OctopusContext, remotes []git.LsRemoteEntry) ([]string,
 			continue
 		}
 
-		if len(mrc) == 1 && common == mrc[0] && !nonFfMerge {
+		if len(mrc) == 1 && common == mrc[0] && isFfMerge {
 			context.Logger.Println("Fast-forwarding to: " + lsRemoteEntry.Ref)
 
 			_, err := context.Repo.Git("read-tree", "-u", "-m", mrc[0], lsRemoteEntry.Sha1)
@@ -116,7 +116,7 @@ func mergeHeads(context *OctopusContext, remotes []git.LsRemoteEntry) ([]string,
 			continue
 		}
 
-		nonFfMerge = true
+		isFfMerge = false
 
 		context.Logger.Println("Trying simple merge with " + lsRemoteEntry.Ref)
 
