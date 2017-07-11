@@ -86,12 +86,14 @@ func Run(context *OctopusContext, args ...string) error {
 func mergeHeads(context *OctopusContext, remotes []git.LsRemoteEntry) ([]string, error) {
 	head, _ := context.Repo.Git("rev-parse", "--verify", "-q", "HEAD")
 
-	mrc := []string{head}
-	mrt, _ := context.Repo.Git("write-tree")
+	// The list of commits that has already merged in the current tree. Originally called 'MRC' in git-merge-octopus.sh
+	mergedHeads := []string{head}
+	// currentTree originally called 'MRT' in git-merge-octopus.sh
+	currentTree, _ := context.Repo.Git("write-tree")
 	isFfMerge := true
 
 	for _, lsRemoteEntry := range remotes {
-		common, err := context.Repo.Git(append([]string{"merge-base", "--all", lsRemoteEntry.Sha1}, mrc...)...)
+		common, err := context.Repo.Git(append([]string{"merge-base", "--all", lsRemoteEntry.Sha1}, mergedHeads...)...)
 
 		if err != nil {
 			return nil, errors.New("Unable to find common commit with " + lsRemoteEntry.Ref)
@@ -102,17 +104,17 @@ func mergeHeads(context *OctopusContext, remotes []git.LsRemoteEntry) ([]string,
 			continue
 		}
 
-		if len(mrc) == 1 && common == mrc[0] && isFfMerge {
+		if len(mergedHeads) == 1 && common == mergedHeads[0] && isFfMerge {
 			context.Logger.Println("Fast-forwarding to: " + lsRemoteEntry.Ref)
 
-			_, err := context.Repo.Git("read-tree", "-u", "-m", mrc[0], lsRemoteEntry.Sha1)
+			_, err := context.Repo.Git("read-tree", "-u", "-m", mergedHeads[0], lsRemoteEntry.Sha1)
 
 			if err != nil {
 				return nil, err
 			}
 
-			mrc[0] = lsRemoteEntry.Sha1
-			mrt, _ = context.Repo.Git("write-tree")
+			mergedHeads[0] = lsRemoteEntry.Sha1
+			currentTree, _ = context.Repo.Git("write-tree")
 			continue
 		}
 
@@ -120,13 +122,13 @@ func mergeHeads(context *OctopusContext, remotes []git.LsRemoteEntry) ([]string,
 
 		context.Logger.Println("Trying simple merge with " + lsRemoteEntry.Ref)
 
-		_, err = context.Repo.Git("read-tree", "-u", "-m", "--aggressive", common, mrt, lsRemoteEntry.Sha1)
+		_, err = context.Repo.Git("read-tree", "-u", "-m", "--aggressive", common, currentTree, lsRemoteEntry.Sha1)
 
 		if err != nil {
 			return nil, err
 		}
 
-		next, err := context.Repo.Git("write-tree")
+		nextTree, err := context.Repo.Git("write-tree")
 
 		if err != nil {
 			context.Logger.Println("Simple merge did not work, trying automatic merge.")
@@ -138,14 +140,14 @@ func mergeHeads(context *OctopusContext, remotes []git.LsRemoteEntry) ([]string,
 				return nil, errors.New("")
 			}
 
-			next, _ = context.Repo.Git("write-tree")
+			nextTree, _ = context.Repo.Git("write-tree")
 		}
 
-		mrc = append(mrc, lsRemoteEntry.Sha1)
-		mrt = next
+		mergedHeads = append(mergedHeads, lsRemoteEntry.Sha1)
+		currentTree = nextTree
 	}
 
-	return mrc, nil
+	return mergedHeads, nil
 }
 
 func octopusCommitMessage(remotes []git.LsRemoteEntry) string {
